@@ -126,7 +126,7 @@ def train_user_baseline(session_id: str):
     conn = sqlite3.connect(DB_FILE)
     
     # Fetch only the calibration data for this exact session
-    query = f"SELECT keys_pressed, mistakes_made, error_rate, mouse_distance_px, scroll_distance_px FROM session_profiles WHERE session_id = '{session_id}'"
+    query = f"SELECT is_touch_device,keys_pressed, mistakes_made, error_rate, mouse_distance_px, scroll_distance_px FROM session_profiles WHERE session_id = '{session_id}'"
     df = pd.read_sql_query(query, conn)
     conn.close()
     

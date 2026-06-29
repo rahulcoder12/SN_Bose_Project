@@ -146,13 +146,6 @@ class BehaviorTracker {
       },
       events: this.buffer
     };
-      events: {
-        keystrokes: [...this.buffer.keystrokes],
-        mouse_movements: [...this.buffer.mouse_movements],
-        clicks: [...this.buffer.clicks],
-        scrolls: [...this.buffer.scrolls]
-      }
-    };
 
     // 3. Clear the main buffer immediately so we don't miss new events while sending
     this.resetBuffer();

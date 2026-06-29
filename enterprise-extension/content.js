@@ -135,9 +135,9 @@ class BehaviorTracker {
     // 2. Package the payload according to our Day 1 Schema
     const payload = {
       session_id: this.sessionId,
-      timestamp_start: Math.min(...this.buffer.keystrokes.map(k => k.t), ...this.buffer.mouse_movements.map(m => m.t), Date.now()),
+      timestamp_start: Date.now() - 5000,
       timestamp_end: Date.now(),
-      is_calibration: this.isCalibrationMode || false, // NEW: Tell the backend if we are establishing a baseline
+      is_calibration: this.isCalibrationMode || false,
       device_context: {
         user_agent: navigator.userAgent,
         screen_resolution: `${window.screen.width}x${window.screen.height}`,
@@ -146,42 +146,31 @@ class BehaviorTracker {
       },
       events: this.buffer
     };
-    events: {
-        keystrokes: [...this.buffer.keystrokes],
-        mouse_movements: [...this.buffer.mouse_movements],
-        clicks: [...this.buffer.clicks],
-        scrolls: [...this.buffer.scrolls]
-      }
-    };
 
     // 3. Clear the main buffer immediately so we don't miss new events while sending
     this.resetBuffer();
 
     // 4. Send the data to the backend API
+    // 4. Send the data to the Background Service Worker (Bypasses CORS)
     try {
-      const response = await fetch('http://localhost:8000/api/v1/ingest', {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'x-api-key': this.apiKey  // NEW: Authenticate the client
-        },
-        body: JSON.stringify(payload),
-        keepalive: true 
+      chrome.runtime.sendMessage({
+          action: "FLUSH_TELEMETRY",
+          payload: payload,
+          apiKey: this.apiKey
+      }, (response) => {
+          if (response && response.status === "success") {
+              console.log("Telemetry flushed via Service Worker. Verdict:", response.data);
+              
+              // --- THE ACTION GATEWAY ---
+              if (response.data.security_action === "require_mfa") {
+                  this.triggerLockdown();
+              }
+          } else {
+              console.error("Service worker failed to deliver payload:", response);
+          }
       });
-
-      if (response.ok) {
-        const result = await response.json();
-        console.log("Telemetry flushed. Server response:", result);
-
-        // --- THE ACTION GATEWAY ---
-        if (result.security_action === "require_mfa") {
-          this.triggerLockdown();
-        }
-      } else {
-        console.error("Failed to send telemetry payload", response.status);
-      }
     } catch (error) {
-      console.error("Network error during telemetry flush:", error);
+      console.error("Failed to communicate with Background Worker:", error);
     }
   }
 }
