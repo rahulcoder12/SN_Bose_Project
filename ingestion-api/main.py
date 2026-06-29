@@ -329,12 +329,13 @@ async def ingest_telemetry(request: Request, payload: TelemetryPayload, x_api_ke
     active_scaler = session.get("scaler", ai_models[device_type]["scaler"])
     
     if active_model is not None and active_scaler is not None:
+        # Reverted keys to exactly match what the Scikit-Learn model was trained on
         live_features = pd.DataFrame([{
-            "keys_pressed": session["total_keystrokes"],
-            "mistakes_made": session["total_corrections"],
-            "error_rate": round(running_error_rate, 2),
-            "mouse_distance_px": round(session["total_mouse_distance_px"], 2),
-            "scroll_distance_px": round(session["total_scroll_distance_px"], 2)
+            "total_keystrokes": session["total_keystrokes"],
+            "total_corrections": session["total_corrections"],
+            "running_error_rate": round(running_error_rate, 2),
+            "total_mouse_distance_px": round(session["total_mouse_distance_px"], 2),
+            "total_scroll_distance_px": round(session["total_scroll_distance_px"], 2)
         }])
         
         live_scaled = active_scaler.transform(live_features)

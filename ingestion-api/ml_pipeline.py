@@ -6,6 +6,7 @@ pd.set_option('display.width', 1000)        # Widen the display area
 from sklearn.preprocessing import StandardScaler
 from sklearn.ensemble import IsolationForest
 import os
+from database import get_db_connection
 
 DB_FILE = "biometrics.db"
 
@@ -18,7 +19,7 @@ def extract_training_data():
         print("❌ Error: Database file not found. Run the ingestion API first.")
         return None
 
-    conn = sqlite3.connect(DB_FILE)
+    conn = get_db_connection()
     
     # FIX: Added is_touch_device to the SELECT query
     query = """
@@ -123,7 +124,7 @@ def train_user_baseline(session_id: str):
     """
     Enterprise Identity: Generates a personal biometric brain for a specific user.
     """
-    conn = sqlite3.connect(DB_FILE)
+    conn = get_db_connection()
     
     # Fetch only the calibration data for this exact session
     query = f"SELECT is_touch_device,keys_pressed, mistakes_made, error_rate, mouse_distance_px, scroll_distance_px FROM session_profiles WHERE session_id = '{session_id}'"
