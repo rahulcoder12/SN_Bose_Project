@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Zero Trust - Initial Calibration</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial; background-color: #f4f4f9; color: #333; display: flex; flex-direction: column; align-items: center; padding: 40px; }
+        .card { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-width: 600px; width: 100%; margin-bottom: 20px; }
+        h2 { margin-top: 0; color: #222; border-bottom: 2px solid #00C851; padding-bottom: 10px; display: inline-block;}
+        .instruction { font-size: 14px; color: #666; margin-bottom: 15px; }
+        
+        /* Typing Test */
+        .reference-text { background: #eef2f5; padding: 15px; border-left: 4px solid #0056b3; font-family: monospace; font-size: 14px; line-height: 1.5; margin-bottom: 15px; user-select: none; }
+        textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; font-family: monospace; resize: vertical; box-sizing: border-box;}
+        
+        /* Mouse Test */
+        #target-area { width: 100%; height: 200px; background: #eef2f5; position: relative; border-radius: 5px; overflow: hidden; margin-top: 15px; border: 1px dashed #ccc;}
+        .target-btn { position: absolute; background: #00C851; color: white; border: none; padding: 10px 15px; border-radius: 50%; cursor: pointer; font-weight: bold; transition: transform 0.1s; }
+        .target-btn:active { transform: scale(0.9); }
+        
+        .progress { margin-top: 20px; font-weight: bold; color: #0056b3; text-align: center; }
+        button.finish { background: #0056b3; color: white; border: none; padding: 12px 24px; border-radius: 5px; cursor: pointer; width: 100%; font-size: 16px; margin-top: 20px;}
+        button.finish:disabled { background: #ccc; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+
+    <h1>Biometric Calibration</h1>
+    <p>To secure your account, we need to establish your baseline behavioral profile.</p>
+
+    <div class="card" id="task-1">
+        <h2>Task 1: Keystroke Dynamics</h2>
+        <p class="instruction">Please type the following paragraph exactly as it appears below. Do not worry about mistakes, just type naturally.</p>
+        <div class="reference-text">
+            The quick brown fox jumps over the lazy dog. Security is not a product, but a continuous process. 
+            By analyzing the unique rhythm of human interaction, we build systems that protect data seamlessly.
+        </div>
+        <textarea id="typing-input" rows="4" placeholder="Start typing here..."></textarea>
+    </div>
+
+    <div class="card" id="task-2">
+        <h2>Task 2: Cursor Velocity</h2>
+        <p class="instruction">Click the green targets as quickly and accurately as possible.</p>
+        <div id="target-area">
+            <button class="target-btn" id="moving-target" style="top: 80px; left: 250px;">Click Me</button>
+        </div>
+        <div class="progress" id="click-progress">Targets hit: 0 / 10</div>
+    </div>
+
+    <button id="complete-btn" class="finish" disabled>Complete Calibration</button>
+
+    <script src="src/tracker.js"></script>
+    
+    <script>
+        // 1. Initialize the tracker specifically for calibration
+        const tracker = new BehaviorTracker("sk_live_51Mabcde12345");
+        
+        // Let the backend know this session is purely for baseline training, not anomaly hunting
+        tracker.isCalibrationMode = true; 
+
+        // 2. Mouse Target Logic
+        let clickCount = 0;
+        const maxClicks = 10;
+        const targetBtn = document.getElementById('moving-target');
+        const progressTxt = document.getElementById('click-progress');
+        const completeBtn = document.getElementById('complete-btn');
+        const typingInput = document.getElementById('typing-input');
+
+        targetBtn.addEventListener('click', () => {
+            clickCount++;
+            progressTxt.innerText = `Targets hit: ${clickCount} / ${maxClicks}`;
+            
+            if (clickCount >= maxClicks) {
+                targetBtn.style.display = 'none';
+                progressTxt.innerText = "Mouse calibration complete!";
+                progressTxt.style.color = "#00C851";
+                checkCompletion();
+            } else {
+                // Move button randomly
+                const areaWidth = document.getElementById('target-area').clientWidth - 80;
+                const areaHeight = 160;
+                const newLeft = Math.floor(Math.random() * areaWidth);
+                const newTop = Math.floor(Math.random() * areaHeight);
+                targetBtn.style.left = `${newLeft}px`;
+                targetBtn.style.top = `${newTop}px`;
+            }
+        });
+
+        typingInput.addEventListener('input', checkCompletion);
+
+        function checkCompletion() {
+            // Enable the finish button only if they hit 10 targets AND typed at least 50 characters
+            if (clickCount >= maxClicks && typingInput.value.length > 50) {
+                completeBtn.disabled = false;
+            }
+        }
+
+        completeBtn.addEventListener('click', async () => {
+            completeBtn.innerText = "Profile Generating...";
+            tracker.flush(); // Send final data
+            
+            try {
+                // Tell the API to build the custom model
+                await fetch('http://localhost:8000/api/v1/calibrate/complete', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'x-api-key': tracker.apiKey 
+                    },
+                    body: JSON.stringify({ session_id: tracker.sessionId })
+                });
+
+                alert("Calibration Complete! Your unique biometric baseline has been secured.");
+                window.location.href = "index.html"; 
+            } catch (error) {
+                console.error("Failed to compile baseline:", error);
+                completeBtn.innerText = "Error. Try Again.";
+            }
+        });
+    </script>
+</body>
+</html>

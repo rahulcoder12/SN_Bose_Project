@@ -1,0 +1,21 @@
+{
+  "session_id": "string",
+  "timestamp_start": "integer",
+  "timestamp_end": "integer",
+  "device_context": {
+    "user_agent": "string",
+    "screen_resolution": "string",
+    "platform": "string"
+  },
+  "events": {
+    "keystrokes": [
+      {"key_code": "string", "event": "string", "t": "integer"}
+    ],
+    "mouse_movements": [
+      {"x": "integer", "y": "integer", "t": "integer"}
+    ],
+    "clicks": [
+      {"x": "integer", "y": "integer", "button": "string", "t": "integer"}
+    ]
+  }
+}
