@@ -222,7 +222,7 @@ async def register_account(payload: UserRegistration):
     
     return {"status": "success", "message": "User registered successfully."}
 
-app.post("/api/v1/auth/login")
+@app.post("/api/v1/auth/login")
 async def login_user(payload: UserRegistration): # Reusing the username/password BaseModel
     if verify_login(payload.username.lower(), payload.password):
         days_left = get_password_age(payload.username.lower())
@@ -428,13 +428,6 @@ async def ingest_telemetry(request: Request, payload: TelemetryPayload, x_api_ke
                 keystrokes=session["total_keystrokes"]
             )
             
-            # --- NEW: Fire the Webhook Alert ---
-            send_security_alert(
-                session_id=session_id,
-                client_name=client_name,
-                risk_score=round(risk_score, 4),
-                keystrokes=session["total_keystrokes"]
-            )
 
     # --- SAVE TO DATABASE ---
     update_session_profile(

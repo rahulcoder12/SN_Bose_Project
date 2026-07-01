@@ -35,14 +35,15 @@
 
                 if (res.ok) {
                     const data = await res.json();
-                    // Save credentials temporarily in sessionStorage to use on the Dashboard
                     sessionStorage.setItem("activeUser", user);
                     sessionStorage.setItem("activePass", pass);
                     sessionStorage.setItem("daysLeft", data.days_until_expiry);
                     
                     window.location.href = "dashboard.html";
                 } else {
-                    error.innerText = "Invalid credentials.";
+                    // NEW: Actually show the exact server error if it fails
+                    const errData = await res.json();
+                    error.innerText = "⚠️ " + errData.detail;
                     error.style.display = "block";
                 }
             } catch (err) {

@@ -46,9 +46,8 @@
     </div>
 
     <script>
-        // Ensure user logged in
+        // Ensure user is logged in
         const activeUser = sessionStorage.getItem("activeUser");
-        const activePass = sessionStorage.getItem("activePass");
         
         if (!activeUser) {
             window.location.href = "login.html"; // Kick them out if not logged in
@@ -66,31 +65,40 @@
             const btn = document.getElementById('regen-btn');
             btn.innerText = "Rotating...";
 
+            // ALWAYS fetch the latest password from storage so multiple clicks work
+            const currentPass = sessionStorage.getItem("activePass");
+
             try {
                 const res = await fetch('/api/v1/auth/regenerate', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username: activeUser, password: activePass })
+                    body: JSON.stringify({ username: activeUser, password: currentPass })
                 });
 
                 if (res.ok) {
                     const data = await res.json();
                     
-                    // Update frontend state
+                    // Update frontend state with the NEW password
                     sessionStorage.setItem("activePass", data.new_password);
                     sessionStorage.setItem("daysLeft", data.days_until_expiry);
                     
                     daysEl.innerText = data.days_until_expiry + " Days";
                     daysEl.classList.remove('warning');
 
-                    // Show new password
+                    // Show new password on the screen
                     const revealBox = document.getElementById('new-pwd-display');
                     revealBox.innerText = data.new_password;
                     revealBox.style.display = "block";
                     btn.innerText = "Regenerate Password";
+                } else {
+                    // CATCH HTTP ERRORS (Like 401 Unauthorized or 500 Server Error)
+                    const errorData = await res.json();
+                    alert("⚠️ Server Error: " + errorData.detail);
+                    btn.innerText = "Regenerate Password";
                 }
             } catch (err) {
-                alert("Failed to rotate password.");
+                // CATCH NETWORK ERRORS
+                alert("⚠️ Network Error: Could not connect to the backend.");
                 btn.innerText = "Regenerate Password";
             }
         });
