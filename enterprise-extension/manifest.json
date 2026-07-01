@@ -4,13 +4,17 @@
   "version": "1.0.0",
   "description": "Continuous biometric authentication overlay.",
   "permissions": [
-    "storage"
+    "storage",
+    "tabs"
   ],
   "host_permissions": [
     "http://localhost:8000/*"
   ],
   "background": {
     "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "Open Security Dashboard"
   },
   "content_scripts": [
     {

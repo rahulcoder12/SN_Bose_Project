@@ -175,6 +175,13 @@ class BehaviorTracker {
   }
 }
 
-console.log("🛡️ Zero Trust Enterprise Shield: Injected and Active.");
-
-const tracker = new BehaviorTracker("sk_live_51Mabcde12345");
+// --- THE GATEKEEPER ---
+// Only start tracking if the user has passed the initial calibration
+chrome.storage.local.get(['isCalibrated'], function(result) {
+    if (result.isCalibrated) {
+        console.log("🛡️ Zero Trust Enterprise Shield: Calibrated and Active.");
+        const tracker = new BehaviorTracker("sk_live_51Mabcde12345");
+    } else {
+        console.log("⚠️ Zero Trust: Calibration pending. Tracker paused.");
+    }
+});

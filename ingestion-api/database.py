@@ -26,6 +26,32 @@ def init_db():
             last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     ''')
+
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS users (
+            username TEXT PRIMARY KEY,
+            password_hash TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+
+    conn.commit()
+    conn.close()
+
+def is_username_taken(username):
+    """Queries the database to see if the username already exists."""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT username FROM users WHERE username = %s", (username,))
+    user = cursor.fetchone()
+    conn.close()
+    return user is not None # Returns True if taken, False if available
+
+def register_new_user(username, password):
+    """Saves the new user to PostgreSQL."""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("INSERT INTO users (username, password_hash) VALUES (%s, %s)", (username, password))
     conn.commit()
     conn.close()
 
@@ -66,3 +92,41 @@ def delete_expired_sessions(hours_to_keep=24):
     conn.close()
     
     return deleted_count
+
+def verify_login(username, password):
+    """Checks if the username and password match the database."""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT password_hash FROM users WHERE username = %s", (username,))
+    user = cursor.fetchone()
+    conn.close()
+    
+    if user and user[0] == password:
+        return True
+    return False
+
+def get_password_age(username):
+    """Calculates how many days are left until the 90-day expiration."""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    # PostgreSQL math to get the difference in days
+    cursor.execute("SELECT EXTRACT(DAY FROM CURRENT_TIMESTAMP - created_at) FROM users WHERE username = %s", (username,))
+    age = cursor.fetchone()
+    conn.close()
+    
+    if age:
+        days_active = int(age[0])
+        return max(0, 90 - days_active)
+    return 0
+
+def update_password(username, new_password):
+    """Regenerates the password and resets the 90-day timer."""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute('''
+        UPDATE users 
+        SET password_hash = %s, created_at = CURRENT_TIMESTAMP 
+        WHERE username = %s
+    ''', (new_password, username))
+    conn.commit()
+    conn.close()

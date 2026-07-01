@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Zero Trust - Web Portal</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto; background: #0f172a; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .card { background: #1e293b; padding: 40px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); width: 350px; text-align: center; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #475569; border-radius: 8px; background: #0f172a; color: white; box-sizing: border-box; }
+        button { background: #38bdf8; color: #0f172a; border: none; padding: 15px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        #error-msg { color: #ef4444; font-size: 13px; display: none; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2 style="color: #38bdf8; margin-top: 0;">Portal Login</h2>
+        <div id="error-msg"></div>
+        <input type="text" id="username" placeholder="Username">
+        <input type="password" id="password" placeholder="Recovery Password">
+        <button id="login-btn">Secure Login</button>
+    </div>
+
+    <script>
+        document.getElementById('login-btn').addEventListener('click', async () => {
+            const user = document.getElementById('username').value.trim();
+            const pass = document.getElementById('password').value.trim();
+            const error = document.getElementById('error-msg');
+
+            try {
+                const res = await fetch('/api/v1/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: user, password: pass })
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    // Save credentials temporarily in sessionStorage to use on the Dashboard
+                    sessionStorage.setItem("activeUser", user);
+                    sessionStorage.setItem("activePass", pass);
+                    sessionStorage.setItem("daysLeft", data.days_until_expiry);
+                    
+                    window.location.href = "dashboard.html";
+                } else {
+                    error.innerText = "Invalid credentials.";
+                    error.style.display = "block";
+                }
+            } catch (err) {
+                error.innerText = "Server offline.";
+                error.style.display = "block";
+            }
+        });
+    </script>
+</body>
+</html>

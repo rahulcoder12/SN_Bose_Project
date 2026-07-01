@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Zero Trust - Security Dashboard</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto; background: #0f172a; color: white; padding: 40px; }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; padding-bottom: 20px; margin-bottom: 20px; }
+        .grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
+        .panel { background: #1e293b; padding: 25px; border-radius: 12px; }
+        .stat-box { font-size: 32px; color: #10b981; font-weight: bold; font-family: monospace; }
+        .warning { color: #f59e0b; }
+        .btn-danger { background: #ef4444; color: white; border: none; padding: 12px; border-radius: 8px; width: 100%; cursor: pointer; font-weight: bold; margin-top: 15px;}
+        .password-reveal { background: #0f172a; padding: 15px; text-align: center; font-family: monospace; font-size: 20px; letter-spacing: 2px; color: #38bdf8; margin-top: 15px; border: 1px dashed #475569; display: none;}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 style="margin:0; color: #38bdf8;">Security Dashboard</h1>
+            <div>Logged in as: <span id="display-user" style="font-weight:bold;"></span></div>
+        </div>
+
+        <div class="grid">
+            <div class="panel">
+                <h2>Active Session Telemetry</h2>
+                <p>Status: <span style="color:#10b981;">● Active & Authenticated</span></p>
+                <div style="background: #0f172a; height: 200px; border-radius: 8px; display: flex; justify-content: center; align-items: center; color: #475569;">
+                    [Live Behavior Graph Will Render Here]
+                </div>
+            </div>
+
+            <div class="panel">
+                <h2>Credential Lifecycle</h2>
+                <p>Password expires in:</p>
+                <div class="stat-box" id="days-left">-- Days</div>
+                
+                <hr style="border: 0; border-top: 1px solid #334155; margin: 20px 0;">
+                
+                <p style="font-size: 14px; color: #94a3b8;">If you believe your step-up password is compromised, rotate it immediately.</p>
+                <button class="btn-danger" id="regen-btn">Regenerate Password</button>
+                <div class="password-reveal" id="new-pwd-display"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Ensure user logged in
+        const activeUser = sessionStorage.getItem("activeUser");
+        const activePass = sessionStorage.getItem("activePass");
+        
+        if (!activeUser) {
+            window.location.href = "login.html"; // Kick them out if not logged in
+        }
+
+        document.getElementById('display-user').innerText = activeUser;
+        
+        const daysLeft = parseInt(sessionStorage.getItem("daysLeft"));
+        const daysEl = document.getElementById('days-left');
+        daysEl.innerText = daysLeft + " Days";
+        if (daysLeft < 15) daysEl.classList.add('warning');
+
+        // Regenerate Logic
+        document.getElementById('regen-btn').addEventListener('click', async () => {
+            const btn = document.getElementById('regen-btn');
+            btn.innerText = "Rotating...";
+
+            try {
+                const res = await fetch('/api/v1/auth/regenerate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: activeUser, password: activePass })
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    
+                    // Update frontend state
+                    sessionStorage.setItem("activePass", data.new_password);
+                    sessionStorage.setItem("daysLeft", data.days_until_expiry);
+                    
+                    daysEl.innerText = data.days_until_expiry + " Days";
+                    daysEl.classList.remove('warning');
+
+                    // Show new password
+                    const revealBox = document.getElementById('new-pwd-display');
+                    revealBox.innerText = data.new_password;
+                    revealBox.style.display = "block";
+                    btn.innerText = "Regenerate Password";
+                }
+            } catch (err) {
+                alert("Failed to rotate password.");
+                btn.innerText = "Regenerate Password";
+            }
+        });
+    </script>
+</body>
+</html>

@@ -21,16 +21,15 @@ def extract_training_data():
 
     conn = get_db_connection()
     
-    # FIX: Added is_touch_device to the SELECT query
+    # SQL Aliases bridge the gap between our clean DB schema and the old ML feature names
     query = """
         SELECT 
-            session_id, 
-            is_touch_device,
-            total_keystrokes, 
-            total_corrections, 
-            running_error_rate, 
-            total_mouse_distance_px, 
-            total_scroll_distance_px
+            is_touch_device, 
+            keys_pressed AS total_keystrokes, 
+            mistakes_made AS total_corrections, 
+            error_rate AS running_error_rate, 
+            mouse_distance_px AS total_mouse_distance_px, 
+            scroll_distance_px AS total_scroll_distance_px 
         FROM session_profiles
     """
     

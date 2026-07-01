@@ -1,5 +1,24 @@
-// --- BACKGROUND SERVICE WORKER ---
-// This bypasses strict website CORS and CSP policies
+// --- EXTENSION ONBOARDING HOOK ---
+chrome.runtime.onInstalled.addListener((details) => {
+    // NEW: Trigger on both 'install' and 'update' while we are building this!
+    if (details.reason === "install" || details.reason === "update") {
+        console.log("📦 Extension Installed or Updated. Initializing Registration...");
+        
+        // Lock the tracker by default
+        chrome.storage.local.set({ isCalibrated: false });
+        
+        // Phase 1 of Onboarding: Open Registration Page
+        chrome.tabs.create({ url: chrome.runtime.getURL("register.html") });
+    }
+});
+
+// --- DASHBOARD SHORTCUT (ICON CLICK) ---
+// --- DASHBOARD SHORTCUT (ICON CLICK) ---
+chrome.action.onClicked.addListener((tab) => {
+    console.log("🖱️ Extension Icon Clicked. Opening Dashboard...");
+    // Point to the new Web App Login Page
+    chrome.tabs.create({ url: "http://localhost:8000/login.html" }); 
+});
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     

@@ -21,7 +21,11 @@ import time
 import requests
 from database import delete_expired_sessions
 from ml_pipeline import train_user_baseline, train_all_models
-
+from database import init_db, update_session_profile, delete_expired_sessions, is_username_taken, register_new_user
+from fastapi.staticfiles import StaticFiles
+from database import verify_login, get_password_age, update_password
+import random
+import string
 
 warnings.filterwarnings("ignore", category=UserWarning)
 # --- PYDANTIC MODELS (Matches Day 1 Schema) ---
@@ -194,6 +198,50 @@ async def startup_event():
     scheduler.add_job(scheduled_background_tasks, 'interval', minutes=2) 
     scheduler.start()
     print("⏰ Automated Continuous Learning Scheduler started (Running every 2 minutes).")
+# --- IDENTITY MANAGEMENT ENDPOINTS ---
+class UserRegistration(BaseModel):
+    username: str
+    password: str
+
+@app.post("/api/v1/auth/register")
+async def register_account(payload: UserRegistration):
+    username = payload.username.lower().strip()
+    
+    # 1. System-level protection (Keep highly sensitive system terms blocked at the API level)
+    system_reserved = ["admin", "root", "system", "administrator"]
+    if username in system_reserved:
+        raise HTTPException(status_code=400, detail="This username is reserved by the system.")
+
+    # 2. Database validation (Check if another user has claimed this)
+    if is_username_taken(username):
+        raise HTTPException(status_code=400, detail="Username is already taken. Please choose another.")
+        
+    # 3. Success! Save to the database
+    # (Note: In a true production app, we would hash the password with bcrypt here before saving)
+    register_new_user(username, payload.password)
+    
+    return {"status": "success", "message": "User registered successfully."}
+
+app.post("/api/v1/auth/login")
+async def login_user(payload: UserRegistration): # Reusing the username/password BaseModel
+    if verify_login(payload.username.lower(), payload.password):
+        days_left = get_password_age(payload.username.lower())
+        return {"status": "success", "days_until_expiry": days_left}
+    
+    raise HTTPException(status_code=401, detail="Invalid username or password.")
+
+@app.post("/api/v1/auth/regenerate")
+async def regenerate_password(payload: UserRegistration):
+    # Verify they actually own the account first
+    if verify_login(payload.username.lower(), payload.password):
+        # Generate new 12-char secure password
+        chars = string.ascii_letters + string.digits
+        new_pwd = ''.join(random.choice(chars) for i in range(12))
+        
+        update_password(payload.username.lower(), new_pwd)
+        return {"status": "success", "new_password": new_pwd, "days_until_expiry": 90}
+    
+    raise HTTPException(status_code=401, detail="Unauthorized")
 
 @app.post(
     "/api/v1/ingest", 
@@ -447,3 +495,11 @@ async def complete_calibration(payload: CalibrationComplete, x_api_key: str = He
 async def get_active_sessions():
     """Returns the live state of all currently tracked user sessions."""
     return {"status": "success", "active_sessions": active_sessions}
+
+# --- STATIC WEB SERVER MOUNT ---
+# Calculate the absolute path to the client-sdk folder
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+CLIENT_SDK_DIR = os.path.join(BASE_DIR, "client-sdk")
+
+# Mount the folder so http://localhost:8000/admin.html serves the UI
+app.mount("/", StaticFiles(directory=CLIENT_SDK_DIR, html=True), name="frontend")
