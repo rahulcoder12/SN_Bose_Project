@@ -1,4 +1,3 @@
-import sqlite3
 import joblib
 import pandas as pd
 pd.set_option('display.max_columns', None)  # Force pandas to show all columns
@@ -8,34 +7,38 @@ from sklearn.ensemble import IsolationForest
 import os
 from database import get_db_connection
 
-DB_FILE = "biometrics.db"
+# Feature columns used across training and inference — single source of truth
+FEATURE_COLUMNS = [
+    "total_keystrokes",
+    "total_corrections",
+    "running_error_rate",
+    "total_mouse_distance_px",
+    "total_scroll_distance_px"
+]
+
 
 def extract_training_data():
     """
-    Connects to the SQLite database and extracts all session profiles 
+    Connects to the PostgreSQL database and extracts all session profiles 
     into a Pandas DataFrame for Machine Learning.
     """
-    if not os.path.exists(DB_FILE):
-        print("❌ Error: Database file not found. Run the ingestion API first.")
-        return None
-
-    conn = get_db_connection()
-    
-    # SQL Aliases bridge the gap between our clean DB schema and the old ML feature names
-    query = """
-        SELECT 
-            is_touch_device, 
-            keys_pressed AS total_keystrokes, 
-            mistakes_made AS total_corrections, 
-            error_rate AS running_error_rate, 
-            mouse_distance_px AS total_mouse_distance_px, 
-            scroll_distance_px AS total_scroll_distance_px 
-        FROM session_profiles
-    """
-    
-    # Load directly into a Pandas DataFrame
-    df = pd.read_sql_query(query, conn)
-    conn.close()
+    with get_db_connection() as conn:
+        query = """
+            SELECT 
+                is_touch_device, 
+                keys_pressed AS total_keystrokes, 
+                mistakes_made AS total_corrections, 
+                error_rate AS running_error_rate, 
+                mouse_distance_px AS total_mouse_distance_px, 
+                scroll_distance_px AS total_scroll_distance_px 
+            FROM session_profiles
+        """
+        
+        try:
+            df = pd.read_sql_query(query, conn)
+        except Exception as e:
+            print(f"❌ Error reading training data: {e}")
+            return None
     
     if df.empty:
         print("⚠️ Warning: No session data found in the database.")
@@ -43,50 +46,36 @@ def extract_training_data():
         
     return df
 
+
 def normalize_features(df):
     """
     Scales numerical biometric features so they have a mean of 0 and variance of 1.
     This prevents large values (like mouse pixels) from dominating the ML model.
     """
-    # 1. Separate the IDs from the actual math features
-    features_to_scale = [
-        "total_keystrokes", 
-        "total_corrections", 
-        "running_error_rate", 
-        "total_mouse_distance_px", 
-        "total_scroll_distance_px"
-    ]
-    
-    # 2. Initialize the Scikit-Learn Scaler
     scaler = StandardScaler()
     
-    # 3. Fit and transform the data
     df_scaled = df.copy()
-    df_scaled[features_to_scale] = scaler.fit_transform(df[features_to_scale])
+    df_scaled[FEATURE_COLUMNS] = scaler.fit_transform(df[FEATURE_COLUMNS])
     
     return df_scaled, scaler
+
 
 def train_anomaly_detector(df_scaled):
     """
     Trains an Isolation Forest model to detect abnormal user behavior.
     """
-    # 1. Drop the session_id so the AI only looks at the math, not the strings
-    X = df_scaled.drop(columns=["session_id"])
+    # Use only the numeric feature columns (no session_id or is_touch_device)
+    X = df_scaled[FEATURE_COLUMNS]
     
-    # 2. Initialize the Isolation Forest
     # contamination=0.1 means we expect roughly 10% of sessions might be anomalies/intruders
     model = IsolationForest(n_estimators=100, contamination=0.1, random_state=42)
-    
-    # 3. Train the model on the biometric data
     model.fit(X)
     
-    # 4. Generate predictions (-1 means Anomaly/Hacker, 1 means Normal User)
     predictions = model.predict(X)
-    
-    # 5. Get the raw anomaly score (lower negative numbers = higher risk)
     scores = model.decision_function(X)
     
     return model, predictions, scores
+
 
 def train_all_models():
     """
@@ -97,11 +86,11 @@ def train_all_models():
     raw_data = extract_training_data()
     
     if raw_data is not None:
-        # 1. Split the data
-        df_desktop = raw_data[raw_data['is_touch_device'] == 0].copy()
-        df_mobile = raw_data[raw_data['is_touch_device'] == 1].copy()
+        # 1. Split the data by device type
+        df_desktop = raw_data[raw_data['is_touch_device'] == False].copy()
+        df_mobile = raw_data[raw_data['is_touch_device'] == True].copy()
         
-        # 2. Train Desktop
+        # 2. Train Desktop model
         if not df_desktop.empty:
             df_desktop = df_desktop.drop(columns=["is_touch_device"])
             scaled_desk, scaler_desk = normalize_features(df_desktop)
@@ -110,7 +99,7 @@ def train_all_models():
             joblib.dump(scaler_desk, "scaler_desktop.joblib")
             print("   💾 [CRON] Desktop AI successfully updated.")
             
-        # 3. Train Mobile
+        # 3. Train Mobile model
         if not df_mobile.empty:
             df_mobile = df_mobile.drop(columns=["is_touch_device"])
             scaled_mob, scaler_mob = normalize_features(df_mobile)
@@ -119,16 +108,21 @@ def train_all_models():
             joblib.dump(scaler_mob, "scaler_mobile.joblib")
             print("   💾 [CRON] Mobile AI successfully updated.")
 
+
 def train_user_baseline(session_id: str):
     """
     Enterprise Identity: Generates a personal biometric brain for a specific user.
+    Uses parameterized query to prevent SQL injection.
     """
-    conn = get_db_connection()
-    
-    # Fetch only the calibration data for this exact session
-    query = f"SELECT is_touch_device,keys_pressed, mistakes_made, error_rate, mouse_distance_px, scroll_distance_px FROM session_profiles WHERE session_id = '{session_id}'"
-    df = pd.read_sql_query(query, conn)
-    conn.close()
+    with get_db_connection() as conn:
+        # SAFE: Parameterized query prevents SQL injection
+        query = """
+            SELECT is_touch_device, keys_pressed, mistakes_made, error_rate, 
+                   mouse_distance_px, scroll_distance_px 
+            FROM session_profiles 
+            WHERE session_id = %s
+        """
+        df = pd.read_sql_query(query, conn, params=(session_id,))
     
     if df.empty:
         print(f"⚠️ No calibration data found for {session_id}")
@@ -147,6 +141,7 @@ def train_user_baseline(session_id: str):
     
     print(f"✅ Personal baseline AI generated securely for {session_id}")
     return True
+
 
 # Keep manual execution capability for testing
 if __name__ == "__main__":

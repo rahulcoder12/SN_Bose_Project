@@ -32,8 +32,20 @@
         const activeCharts = {};
 
         async function fetchSessions() {
+            const token = sessionStorage.getItem("accessToken");
+            if (!token) {
+                window.location.href = "/login.html";
+                return;
+            }
             try {
-                const response = await fetch('http://localhost:8000/api/v1/admin/sessions');
+                const response = await fetch('/api/v1/admin/sessions', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                if (response.status === 401) {
+                    sessionStorage.clear();
+                    window.location.href = "/login.html";
+                    return;
+                }
                 const data = await response.json();
                 renderDashboard(data.active_sessions);
             } catch (error) {

@@ -2,4 +2,9 @@ venv/
 __pycache__/
 *.db
 *.pyc
+*.joblib
 .DS_Store
+.env
+.git
+*.log
+tests/

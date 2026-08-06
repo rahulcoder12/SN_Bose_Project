@@ -14,6 +14,7 @@
         .btn-danger { background: #ef4444; color: white; border: none; padding: 12px; border-radius: 8px; width: 100%; cursor: pointer; font-weight: bold; margin-top: 15px;}
         .password-reveal { background: #0f172a; padding: 15px; text-align: center; font-family: monospace; font-size: 20px; letter-spacing: 2px; color: #38bdf8; margin-top: 15px; border: 1px dashed #475569; display: none;}
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div class="container">
@@ -26,8 +27,8 @@
             <div class="panel">
                 <h2>Active Session Telemetry</h2>
                 <p>Status: <span style="color:#10b981;">● Active & Authenticated</span></p>
-                <div style="background: #0f172a; height: 200px; border-radius: 8px; display: flex; justify-content: center; align-items: center; color: #475569;">
-                    [Live Behavior Graph Will Render Here]
+                <div style="background: #0f172a; height: 200px; border-radius: 8px; position: relative;">
+                    <canvas id="behaviorChart"></canvas>
                 </div>
             </div>
 
@@ -46,11 +47,12 @@
     </div>
 
     <script>
-        // Ensure user is logged in
+        // Ensure user is logged in (check for JWT token)
         const activeUser = sessionStorage.getItem("activeUser");
+        const accessToken = sessionStorage.getItem("accessToken");
         
-        if (!activeUser) {
-            window.location.href = "login.html"; // Kick them out if not logged in
+        if (!activeUser || !accessToken) {
+            window.location.href = "/login.html";
         }
 
         document.getElementById('display-user').innerText = activeUser;
@@ -60,26 +62,118 @@
         daysEl.innerText = daysLeft + " Days";
         if (daysLeft < 15) daysEl.classList.add('warning');
 
-        // Regenerate Logic
+        if (daysLeft < 10) {
+            daysEl.classList.add('warning');
+        }
+
+        // --- Live Behavior Graph Implementation ---
+        const ctx = document.getElementById('behaviorChart').getContext('2d');
+        const chartData = {
+            labels: Array(20).fill(''), // 20 data points of history
+            datasets: [{
+                label: 'AI Risk Score (Anomaly Detection)',
+                data: Array(20).fill(1.0), // Start with neutral 1.0
+                borderColor: '#10b981', // green default
+                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4,
+                pointRadius: 0
+            }]
+        };
+
+        const behaviorChart = new Chart(ctx, {
+            type: 'line',
+            data: chartData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { 
+                        min: -1.0, max: 1.0, 
+                        grid: { color: '#334155' },
+                        ticks: { color: '#94a3b8' }
+                    },
+                    x: { 
+                        grid: { display: false },
+                        ticks: { display: false }
+                    }
+                },
+                plugins: {
+                    legend: { labels: { color: '#cbd5e1' } }
+                },
+                animation: { duration: 500 }
+            }
+        });
+
+        async function pollTelemetry() {
+            try {
+                const response = await fetch('/api/v1/admin/sessions', {
+                    headers: { 'Authorization': 'Bearer ' + accessToken }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    const sessions = data.active_sessions;
+                    const sessionIds = Object.keys(sessions);
+                    
+                    let latestScore = 1.0; // Default if idle
+
+                    if (sessionIds.length > 0) {
+                        // Plot the most recently updated session
+                        let mostRecent = sessions[sessionIds[0]];
+                        for (let id of sessionIds) {
+                            if (sessions[id].last_seen > mostRecent.last_seen) {
+                                mostRecent = sessions[id];
+                            }
+                        }
+                        latestScore = mostRecent.risk_score;
+                    }
+
+                    // Shift data array and append new score
+                    chartData.datasets[0].data.shift();
+                    chartData.datasets[0].data.push(latestScore);
+
+                    // Change color to red if anomalous
+                    if (latestScore < 0) {
+                        chartData.datasets[0].borderColor = '#ef4444';
+                        chartData.datasets[0].backgroundColor = 'rgba(239, 68, 68, 0.1)';
+                    } else {
+                        chartData.datasets[0].borderColor = '#10b981';
+                        chartData.datasets[0].backgroundColor = 'rgba(16, 185, 129, 0.1)';
+                    }
+
+                    behaviorChart.update();
+                }
+            } catch (error) {
+                console.error("Telemetry polling failed:", error);
+            }
+        }
+
+        // Poll every 2 seconds
+        setInterval(pollTelemetry, 2000);
+        pollTelemetry();
+        // -------------------------------------------
+
+        // Regenerate Logic — uses JWT Bearer token instead of raw password
         document.getElementById('regen-btn').addEventListener('click', async () => {
             const btn = document.getElementById('regen-btn');
             btn.innerText = "Rotating...";
 
-            // ALWAYS fetch the latest password from storage so multiple clicks work
-            const currentPass = sessionStorage.getItem("activePass");
+            const token = sessionStorage.getItem("accessToken");
 
             try {
                 const res = await fetch('/api/v1/auth/regenerate', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username: activeUser, password: currentPass })
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    }
                 });
 
                 if (res.ok) {
                     const data = await res.json();
                     
-                    // Update frontend state with the NEW password
-                    sessionStorage.setItem("activePass", data.new_password);
                     sessionStorage.setItem("daysLeft", data.days_until_expiry);
                     
                     daysEl.innerText = data.days_until_expiry + " Days";
@@ -90,14 +184,16 @@
                     revealBox.innerText = data.new_password;
                     revealBox.style.display = "block";
                     btn.innerText = "Regenerate Password";
+                } else if (res.status === 401) {
+                    // Token expired — redirect to login
+                    sessionStorage.clear();
+                    window.location.href = "/login.html";
                 } else {
-                    // CATCH HTTP ERRORS (Like 401 Unauthorized or 500 Server Error)
                     const errorData = await res.json();
                     alert("⚠️ Server Error: " + errorData.detail);
                     btn.innerText = "Regenerate Password";
                 }
             } catch (err) {
-                // CATCH NETWORK ERRORS
                 alert("⚠️ Network Error: Could not connect to the backend.");
                 btn.innerText = "Regenerate Password";
             }

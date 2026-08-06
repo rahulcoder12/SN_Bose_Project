@@ -117,14 +117,71 @@ class BehaviorTracker {
     // Stop flushing data to the server
     clearInterval(this.flushInterval);
     
-    // Look for an MFA overlay in the HTML and display it
-    const overlay = document.getElementById("mfa-overlay");
-    if (overlay) {
-      overlay.style.display = "flex";
-    } else {
-      // Fallback if the HTML hasn't been updated yet
-      alert("SECURITY ALERT: Abnormal behavior detected. Please verify your identity.");
-    }
+    // Check if we already injected it
+    if (document.getElementById("zt-mfa-overlay")) return;
+
+    // Create a full-screen overlay
+    const overlay = document.createElement("div");
+    overlay.id = "zt-mfa-overlay";
+    overlay.style.position = "fixed";
+    overlay.style.top = "0";
+    overlay.style.left = "0";
+    overlay.style.width = "100vw";
+    overlay.style.height = "100vh";
+    overlay.style.backgroundColor = "rgba(15, 23, 42, 0.95)";
+    overlay.style.backdropFilter = "blur(10px)";
+    overlay.style.zIndex = "2147483647"; // Max z-index
+    overlay.style.display = "flex";
+    overlay.style.flexDirection = "column";
+    overlay.style.justifyContent = "center";
+    overlay.style.alignItems = "center";
+    overlay.style.color = "white";
+    overlay.style.fontFamily = "sans-serif";
+
+    overlay.innerHTML = `
+      <div style="background: #1e293b; padding: 40px; border-radius: 12px; text-align: center; max-width: 400px; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
+        <h2 style="color: #ef4444; margin-top: 0;">🚨 Security Lockdown</h2>
+        <p style="color: #94a3b8; margin-bottom: 20px;">Abnormal behavior detected. Please verify your identity to continue your session.</p>
+        <input type="password" id="zt-mfa-password" placeholder="Enter your password" style="width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #334155; background: #0f172a; color: white; box-sizing: border-box;">
+        <button id="zt-mfa-submit" style="width: 100%; padding: 12px; border-radius: 6px; border: none; background: #38bdf8; color: #0f172a; font-weight: bold; cursor: pointer;">Verify Identity</button>
+        <p id="zt-mfa-error" style="color: #ef4444; font-size: 14px; margin-top: 15px; display: none;">⚠️ Incorrect password.</p>
+      </div>
+    `;
+
+    document.body.appendChild(overlay);
+
+    const input = document.getElementById("zt-mfa-password");
+    input.focus();
+
+    // Prevent scrolling behind the overlay
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    const submitBtn = document.getElementById("zt-mfa-submit");
+    const errorMsg = document.getElementById("zt-mfa-error");
+
+    const verifyPassword = () => {
+        chrome.storage.local.get(['recoveryPassword'], (result) => {
+            if (input.value === result.recoveryPassword) {
+                // Unlock
+                document.body.removeChild(overlay);
+                document.body.style.overflow = originalOverflow;
+                
+                // Clear old anomalous events and resume tracking
+                this.resetBuffer(); 
+                this.flushInterval = setInterval(() => { this.flush(); }, 5000); 
+            } else {
+                errorMsg.style.display = "block";
+                input.value = "";
+                input.focus();
+            }
+        });
+    };
+
+    submitBtn.addEventListener("click", verifyPassword);
+    input.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") verifyPassword();
+    });
   }
   async flush() {
     // 1. Check if there is actually any data to send. If the user is idle, do nothing.

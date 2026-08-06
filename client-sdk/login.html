@@ -36,10 +36,11 @@
                 if (res.ok) {
                     const data = await res.json();
                     sessionStorage.setItem("activeUser", user);
-                    sessionStorage.setItem("activePass", pass);
+                    sessionStorage.setItem("accessToken", data.access_token);
+                    sessionStorage.setItem("refreshToken", data.refresh_token);
                     sessionStorage.setItem("daysLeft", data.days_until_expiry);
                     
-                    window.location.href = "dashboard.html";
+                    window.location.href = "/dashboard.html";
                 } else {
                     // NEW: Actually show the exact server error if it fails
                     const errData = await res.json();
