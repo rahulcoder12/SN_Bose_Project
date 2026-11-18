@@ -1,0 +1,92 @@
+/* ═══════════════════════════════════════════════════════════════
+   ANIMATIONS & KEYFRAMES  |  css/utils/animations.css
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ─── ROTATION ─────────────────────────────────────────────────── */
+@keyframes spin-cw  { from { transform: rotate(  0deg); } to { transform: rotate( 360deg); } }
+@keyframes spin-ccw { from { transform: rotate(  0deg); } to { transform: rotate(-360deg); } }
+
+/* ─── FLOAT ────────────────────────────────────────────────────── */
+@keyframes float-y {
+  0%, 100% { transform: translateY(0px);   }
+  50%       { transform: translateY(-12px); }
+}
+
+@keyframes float-a {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-8px); }
+}
+
+@keyframes float-b {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY( 8px); }
+}
+
+/* ─── PULSE ────────────────────────────────────────────────────── */
+@keyframes blink-dot {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.35; }
+}
+
+@keyframes pulse-bar {
+  0%        { width: 45%; }
+  50%        { width: 90%; }
+  100%       { width: 45%; }
+}
+
+/* ─── FADE / SLIDE IN ──────────────────────────────────────────── */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(30px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ─── TYPING CURSOR ────────────────────────────────────────────── */
+@keyframes caret-blink {
+  0%, 100% { border-right-color: var(--color-accent-cyan); }
+  50%       { border-right-color: transparent; }
+}
+
+.typing-cursor {
+  border-right: 2px solid var(--color-accent-cyan);
+  animation: caret-blink 0.8s step-start infinite;
+  padding-right: 2px;
+}
+
+/* ─── RIPPLE ───────────────────────────────────────────────────── */
+@keyframes ripple-expand {
+  to { transform: translate(-50%, -50%) scale(6); opacity: 0; }
+}
+
+/* ─── GLOW PULSE ───────────────────────────────────────────────── */
+@keyframes glow-pulse {
+  0%, 100% { opacity: 0.6; }
+  50%       { opacity: 1.0; }
+}
+
+/* ─── SCROLL-REVEAL UTILITY ────────────────────────────────────── */
+/* Base state — set on elements before JS adds .visible class */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition:
+    opacity  var(--dur-slower) var(--ease-out),
+    transform var(--dur-slower) var(--ease-out);
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Staggered delays applied via data-delay attribute in JS */
+.reveal[data-delay="1"] { transition-delay: 80ms;  }
+.reveal[data-delay="2"] { transition-delay: 160ms; }
+.reveal[data-delay="3"] { transition-delay: 240ms; }
+.reveal[data-delay="4"] { transition-delay: 320ms; }
+.reveal[data-delay="5"] { transition-delay: 400ms; }
+.reveal[data-delay="6"] { transition-delay: 480ms; }

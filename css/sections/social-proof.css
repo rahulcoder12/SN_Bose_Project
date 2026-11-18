@@ -1,0 +1,42 @@
+/* ═══════════════════════════════════════════════════════════════
+   SOCIAL PROOF  |  css/sections/social-proof.css
+   ═══════════════════════════════════════════════════════════════ */
+
+.social-proof {
+  position: relative;
+  z-index: var(--z-content);
+  padding-block: var(--space-10);
+  border-block: 1px solid var(--color-border);
+  background: var(--color-bg-glass);
+  backdrop-filter: blur(10px);
+}
+
+.sp-label {
+  text-align: center;
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-widest);
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-6);
+}
+
+.sp-logos {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-12);
+  flex-wrap: wrap;
+}
+
+.sp-logo {
+  font-family: var(--font-display);
+  font-size: var(--text-base);
+  font-weight: 600;
+  color: var(--color-text-muted);
+  opacity: 0.55;
+  letter-spacing: var(--tracking-wide);
+  transition: opacity var(--transition-base), color var(--transition-base);
+  cursor: default;
+}
+
+.sp-logo:hover { opacity: 1; color: var(--color-text-secondary); }

@@ -1,0 +1,103 @@
+/* ═══════════════════════════════════════════════════════════════
+   RESET & BASE LAYOUT  |  css/base/reset.css
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ─── BOX MODEL ────────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* ─── HTML & BODY ─────────────────────────────────────────────── */
+html {
+  scroll-behavior: smooth;
+  font-size: 16px;
+  text-rendering: optimizeLegibility;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  line-height: var(--leading-normal);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition:
+    background-color var(--transition-slow),
+    color var(--transition-slow);
+}
+
+/* ─── ELEMENT RESETS ──────────────────────────────────────────── */
+img, video, svg   { display: block; max-width: 100%; }
+button, input,
+select, textarea  { font: inherit; }
+a                 { color: inherit; text-decoration: none; }
+ul, ol            { list-style: none; }
+
+/* ─── CANVAS: PARTICLES ───────────────────────────────────────── */
+#particles-canvas {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: var(--z-particles);
+  /* opacity driven by glow-intensity CSS var updated by JS */
+  opacity: calc(0.55 + var(--glow-intensity) * 0.15);
+  transition: opacity 0.6s ease;
+}
+
+/* ─── SCROLL PROGRESS BAR ─────────────────────────────────────── */
+/* Width is driven by --scroll-ratio (0→1) updated in JS */
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 2px;
+  width: calc(var(--scroll-ratio) * 100%);
+  background: linear-gradient(
+    90deg,
+    hsl(var(--page-hue), 100%, 55%),
+    var(--color-accent-cyan)
+  );
+  z-index: calc(var(--z-nav) + 10);
+  box-shadow: 0 0 14px hsl(var(--page-hue), 100%, 60%);
+  /* No transition here — must be instant to feel real-time */
+  pointer-events: none;
+}
+
+/* ─── CONTAINER ────────────────────────────────────────────────── */
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin-inline: auto;
+  padding-inline: var(--space-6);
+}
+
+/* ─── SCROLLBAR ───────────────────────────────────────────────── */
+::-webkit-scrollbar            { width: 5px; }
+::-webkit-scrollbar-track      { background: var(--color-bg-primary); }
+::-webkit-scrollbar-thumb      {
+  background: hsl(var(--page-hue), 80%, 42%);
+  border-radius: var(--radius-full);
+}
+::-webkit-scrollbar-thumb:hover { background: hsl(var(--page-hue), 90%, 55%); }
+
+/* ─── FOCUS RING ──────────────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--color-accent-cyan);
+  outline-offset: 3px;
+  border-radius: var(--radius-xs);
+}
+
+/* ─── UTILITY: Visually Hidden (A11Y) ─────────────────────────── */
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  white-space: nowrap;
+  border-width: 0;
+}

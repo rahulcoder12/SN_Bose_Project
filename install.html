@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="cyber">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Install Zero Trust Auth — Chrome Extension Setup Guide</title>
+  <meta name="description" content="Step-by-step guide to install the Zero Trust Auth behavioral biometric Chrome extension in under 2 minutes." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/main.css" />
+  <style>
+    /* ── Install page specific ─────────────────────────────── */
+    .install-hero {
+      min-height: 40vh;
+      display: flex;
+      align-items: center;
+      padding-block: 120px 60px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .install-hero-glow {
+      position: absolute;
+      width: 700px; height: 400px;
+      background: radial-gradient(ellipse, hsl(var(--page-hue),100%,55%,0.12), transparent 70%);
+      top: -100px; left: 50%; transform: translateX(-50%);
+      pointer-events: none;
+    }
+
+    .install-hero h1 {
+      font-family: var(--font-display);
+      font-size: var(--text-3xl);
+      font-weight: 800;
+      letter-spacing: var(--tracking-tight);
+      line-height: var(--leading-tight);
+      margin-bottom: var(--space-4);
+    }
+
+    .install-hero p {
+      font-size: var(--text-lg);
+      color: var(--color-text-secondary);
+      max-width: 580px;
+      line-height: var(--leading-loose);
+    }
+
+    /* ── Download trigger card ─────────────────────────────── */
+    .download-trigger {
+      background: var(--color-bg-card);
+      border: 1px solid hsl(var(--page-hue),100%,55%,0.30);
+      border-radius: var(--radius-md);
+      padding: var(--space-8);
+      display: flex;
+      align-items: center;
+      gap: var(--space-6);
+      margin-block: var(--space-12);
+      box-shadow: 0 0 60px hsl(var(--page-hue),100%,55%,0.10);
+      flex-wrap: wrap;
+    }
+
+    .dt-icon {
+      width: 64px; height: 64px;
+      background: hsl(var(--page-hue),100%,55%,0.10);
+      border: 1px solid hsl(var(--page-hue),100%,55%,0.25);
+      border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      font-size: 2rem;
+    }
+
+    .dt-text { flex: 1; min-width: 200px; }
+    .dt-text h3 { font-family: var(--font-display); font-size: var(--text-xl); font-weight: 700; margin-bottom: var(--space-1); }
+    .dt-text p  { font-size: var(--text-sm); color: var(--color-text-muted); }
+
+    .dt-meta {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-1);
+      font-size: var(--text-xs);
+      color: var(--color-text-muted);
+    }
+
+    .dt-meta span { display: flex; align-items: center; gap: var(--space-2); }
+
+    /* ── Steps grid ────────────────────────────────────────── */
+    .steps-section { padding-block: var(--space-section); }
+
+    .steps-section h2 {
+      font-family: var(--font-display);
+      font-size: var(--text-2xl);
+      font-weight: 700;
+      margin-bottom: var(--space-10);
+      letter-spacing: var(--tracking-tight);
+    }
+
+    .install-steps {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-4);
+      counter-reset: install-step;
+    }
+
+    .install-step {
+      display: grid;
+      grid-template-columns: 52px 1fr;
+      gap: var(--space-5);
+      align-items: start;
+      background: var(--color-bg-card);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-6);
+      transition: border-color var(--transition-base), transform var(--transition-base);
+      counter-increment: install-step;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .install-step::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 3px;
+      background: linear-gradient(180deg, hsl(var(--page-hue),100%,55%), var(--color-accent-cyan));
+      opacity: 0;
+      transition: opacity var(--transition-base);
+    }
+
+    .install-step.active::before,
+    .install-step:hover::before { opacity: 1; }
+    .install-step.active  { border-color: hsl(var(--page-hue),100%,55%,0.30); transform: translateX(4px); }
+    .install-step:hover   { border-color: var(--color-border-bright); }
+
+    .step-num {
+      width: 52px; height: 52px;
+      display: flex; align-items: center; justify-content: center;
+      background: hsl(var(--page-hue),100%,55%,0.10);
+      border: 1px solid hsl(var(--page-hue),100%,55%,0.22);
+      border-radius: 50%;
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--color-accent-cyan);
+      flex-shrink: 0;
+    }
+
+    .step-body h3 {
+      font-family: var(--font-display);
+      font-size: var(--text-lg);
+      font-weight: 600;
+      margin-bottom: var(--space-2);
+    }
+
+    .step-body p {
+      font-size: var(--text-base);
+      color: var(--color-text-secondary);
+      line-height: var(--leading-loose);
+      margin-bottom: var(--space-3);
+    }
+
+    /* Step visual mockup */
+    .step-mockup {
+      background: rgba(0,0,0,0.35);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-4);
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      color: var(--color-text-secondary);
+      margin-top: var(--space-3);
+    }
+
+    .mockup-bar {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xs);
+      padding: 6px 10px;
+      margin-bottom: var(--space-3);
+      font-size: var(--text-sm);
+      color: var(--color-text-secondary);
+    }
+
+    .mockup-bar-url {
+      flex: 1;
+      background: rgba(255,255,255,0.03);
+      border-radius: var(--radius-xs);
+      padding: 3px 8px;
+      font-size: var(--text-xs);
+      color: var(--color-text-muted);
+    }
+
+    .mockup-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-2) 0;
+      border-bottom: 1px solid var(--color-border);
+      font-size: var(--text-xs);
+    }
+
+    .mockup-row:last-child { border-bottom: none; }
+
+    .toggle-on {
+      width: 32px; height: 18px;
+      background: var(--color-accent-green);
+      border-radius: var(--radius-full);
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .toggle-on::after {
+      content: '';
+      position: absolute;
+      right: 2px; top: 2px;
+      width: 14px; height: 14px;
+      background: white;
+      border-radius: 50%;
+    }
+
+    /* ── Notice box ────────────────────────────────────────── */
+    .notice {
+      display: flex;
+      gap: var(--space-4);
+      background: hsl(155,100%,43%,0.07);
+      border: 1px solid hsl(155,100%,43%,0.20);
+      border-radius: var(--radius-sm);
+      padding: var(--space-5);
+      margin-top: var(--space-3);
+      font-size: var(--text-sm);
+      color: var(--color-text-secondary);
+      line-height: var(--leading-loose);
+    }
+
+    .notice-icon { font-size: 1.4rem; flex-shrink: 0; }
+
+    .notice-warn {
+      background: hsl(35,100%,55%,0.08);
+      border-color: hsl(35,100%,55%,0.22);
+    }
+
+    /* ── Completion banner ─────────────────────────────────── */
+    .install-done {
+      text-align: center;
+      padding-block: var(--space-section);
+    }
+
+    .done-icon {
+      font-size: 4rem;
+      margin-bottom: var(--space-5);
+      animation: float-y 4s ease-in-out infinite;
+      display: block;
+    }
+
+    .install-done h2 {
+      font-family: var(--font-display);
+      font-size: var(--text-3xl);
+      font-weight: 800;
+      margin-bottom: var(--space-4);
+      letter-spacing: var(--tracking-tight);
+    }
+
+    .install-done p {
+      color: var(--color-text-secondary);
+      font-size: var(--text-lg);
+      max-width: 480px;
+      margin: 0 auto var(--space-10);
+    }
+
+    /* ── Download status toast ─────────────────────────────── */
+    #download-toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--color-bg-card);
+      border: 1px solid hsl(155,100%,43%,0.35);
+      border-radius: var(--radius-sm);
+      padding: var(--space-4) var(--space-6);
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      font-size: var(--text-sm);
+      font-weight: 600;
+      color: var(--color-accent-green);
+      box-shadow: var(--shadow-lg);
+      z-index: var(--z-modal);
+      transform: translateY(80px);
+      opacity: 0;
+      transition: all var(--transition-base);
+      pointer-events: none;
+    }
+
+    #download-toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    @media (max-width: 768px) {
+      .install-step { grid-template-columns: 1fr; }
+      .step-num     { width: 40px; height: 40px; font-size: 1rem; }
+      .download-trigger { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="scroll-progress" aria-hidden="true"></div>
+  <canvas id="particles-canvas" aria-hidden="true"></canvas>
+
+  <!-- NAVBAR (simplified) -->
+  <nav id="navbar" role="navigation" aria-label="Main navigation">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-logo" aria-label="Zero Trust Auth — Home">
+        <div class="logo-shield" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 28 28" fill="none">
+            <path d="M14 2L4 6.5V13.5C4 19.3 8.4 24.7 14 26C19.6 24.7 24 19.3 24 13.5V6.5L14 2Z"
+              fill="url(#si-fill)" stroke="url(#si-stroke)" stroke-width="0.5"/>
+            <circle cx="14" cy="14" r="4" fill="none" stroke="#00d4ff" stroke-width="1.5" opacity="0.8"/>
+            <circle cx="14" cy="14" r="2" fill="#00d4ff" opacity="0.9"/>
+            <defs>
+              <linearGradient id="si-fill"   x1="4" y1="2" x2="24" y2="26" gradientUnits="userSpaceOnUse"><stop stop-color="#0066ff" stop-opacity="0.3"/><stop offset="1" stop-color="#00d4ff" stop-opacity="0.15"/></linearGradient>
+              <linearGradient id="si-stroke" x1="4" y1="2" x2="24" y2="26" gradientUnits="userSpaceOnUse"><stop stop-color="#0099ff"/><stop offset="1" stop-color="#00d4ff"/></linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <span class="logo-text">Zero Trust <span class="logo-accent">Auth</span></span>
+      </a>
+
+      <ul class="nav-links" id="nav-links" role="list" style="margin-inline-start:auto">
+        <li><a href="index.html#features" class="nav-link">Features</a></li>
+        <li><a href="index.html#download" class="nav-link">Download</a></li>
+        <li><a href="index.html#docs"     class="nav-link">API Docs</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <div class="theme-switcher" role="group" aria-label="Choose theme">
+          <button class="theme-btn active" data-theme="cyber"   title="Cyber Dark"  aria-label="Cyber Dark">🌑</button>
+          <button class="theme-btn"        data-theme="space"   title="Deep Space"  aria-label="Deep Space">🔮</button>
+          <button class="theme-btn"        data-theme="emerald" title="Emerald"     aria-label="Emerald">🌿</button>
+        </div>
+        <button class="hamburger" id="hamburger" aria-controls="nav-links" aria-expanded="false" aria-label="Toggle menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ── INSTALL HERO ─────────────────────────────────────────── -->
+  <section class="install-hero" aria-labelledby="install-heading">
+    <div class="install-hero-glow" aria-hidden="true"></div>
+    <div class="container" style="text-align:center">
+      <div class="hero-badge" style="justify-content:center">
+        <span class="badge-dot" aria-hidden="true"></span>
+        Chrome Extension — Manifest V3
+      </div>
+      <h1 class="gradient-text" id="install-heading">Install Zero Trust Auth</h1>
+      <p style="margin-inline:auto">
+        Follow these 4 steps to add the extension to Chrome in under 2 minutes.
+        No developer account needed — load it directly from your computer.
+      </p>
+    </div>
+  </section>
+
+  <!-- ── MAIN CONTENT ─────────────────────────────────────────── -->
+  <main class="container">
+
+    <!-- Download trigger card -->
+    <div class="download-trigger" id="download-trigger-card" role="region" aria-label="Extension download">
+      <div class="dt-icon" aria-hidden="true">🛡️</div>
+      <div class="dt-text">
+        <h3>Zero Trust Auth Extension</h3>
+        <p>Version 1.0.0 · Manifest V3 · Chromium-based browsers</p>
+      </div>
+      <div class="dt-meta" aria-label="File details">
+        <span>📦 <strong>enterprise-extension.zip</strong></span>
+        <span>🔒 Contains: manifest.json, content.js, background.js, calibration &amp; register files</span>
+        <span>✅ Safe to load — open source code</span>
+      </div>
+      <a href="assets/downloads/zero-trust-auth-extension.zip"
+         id="download-zip-btn"
+         class="btn btn-hero-primary"
+         download="enterprise-extension.zip"
+         aria-label="Download Zero Trust Auth extension ZIP">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="7 10 12 15 17 10"/>
+          <line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        Download Extension ZIP
+      </a>
+    </div>
+
+    <!-- Steps -->
+    <section class="steps-section" aria-labelledby="steps-heading">
+      <h2 id="steps-heading">Installation Steps</h2>
+
+      <ol class="install-steps" aria-label="Installation steps">
+
+        <!-- Step 1 -->
+        <li class="install-step active" id="step-1" aria-current="step">
+          <div class="step-num" aria-hidden="true">1</div>
+          <div class="step-body">
+            <h3>Download &amp; Extract the ZIP</h3>
+            <p>Click the <strong>"Download Extension ZIP"</strong> button above. Once downloaded, right-click the ZIP file and select <strong>Extract All</strong> (Windows) or double-click (Mac). Remember where you extracted it — you'll need that folder in Step 3.</p>
+            <div class="notice">
+              <span class="notice-icon" aria-hidden="true">💡</span>
+              <span>Extract to a <strong>permanent location</strong> (e.g. <code>Documents\enterprise-extension</code>). If you delete the folder later, the extension will stop working.</span>
+            </div>
+          </div>
+        </li>
+
+        <!-- Step 2 -->
+        <li class="install-step" id="step-2">
+          <div class="step-num" aria-hidden="true">2</div>
+          <div class="step-body">
+            <h3>Open Chrome Extensions Page</h3>
+            <p>In Chrome (or Edge / Brave / Arc), navigate to the Extensions manager. You can do this three ways:</p>
+            <div class="step-mockup" aria-label="Chrome address bar showing extensions URL">
+              <div class="mockup-bar">
+                <span>🔒</span>
+                <div class="mockup-bar-url">chrome://extensions</div>
+                <span style="font-size:1rem">↵</span>
+              </div>
+              <div style="font-size:var(--text-xs);color:var(--color-text-muted);padding-top:var(--space-1)">
+                Or: Chrome menu (⋮) → <strong>Extensions</strong> → <strong>Manage Extensions</strong>
+              </div>
+            </div>
+          </div>
+        </li>
+
+        <!-- Step 3 -->
+        <li class="install-step" id="step-3">
+          <div class="step-num" aria-hidden="true">3</div>
+          <div class="step-body">
+            <h3>Enable Developer Mode</h3>
+            <p>On the Extensions page, toggle on <strong>Developer mode</strong> in the top-right corner. This allows Chrome to load extensions that aren't from the Web Store.</p>
+            <div class="step-mockup" aria-label="Chrome developer mode toggle">
+              <div class="mockup-row" style="justify-content:space-between">
+                <span>🛠️ Developer mode</span>
+                <div class="toggle-on" role="img" aria-label="Toggle is ON"></div>
+              </div>
+              <div class="mockup-row" style="gap:var(--space-2);padding-top:var(--space-3)">
+                <span style="padding:4px 10px;background:hsl(var(--page-hue),100%,55%,0.12);border:1px solid hsl(var(--page-hue),100%,55%,0.25);border-radius:4px;color:var(--color-accent-cyan);font-size:var(--text-xs)">Load unpacked</span>
+                <span style="padding:4px 10px;background:rgba(255,255,255,0.04);border:1px solid var(--color-border);border-radius:4px;font-size:var(--text-xs)">Pack extension</span>
+                <span style="padding:4px 10px;background:rgba(255,255,255,0.04);border:1px solid var(--color-border);border-radius:4px;font-size:var(--text-xs)">Update</span>
+              </div>
+            </div>
+            <div class="notice notice-warn">
+              <span class="notice-icon" aria-hidden="true">⚠️</span>
+              <span>Chrome will show a <strong>"Developer mode extensions"</strong> banner on startup — this is normal for sideloaded extensions. Click <strong>Cancel</strong> to dismiss it.</span>
+            </div>
+          </div>
+        </li>
+
+        <!-- Step 4 -->
+        <li class="install-step" id="step-4">
+          <div class="step-num" aria-hidden="true">4</div>
+          <div class="step-body">
+            <h3>Load Unpacked Extension</h3>
+            <p>Click the <strong>"Load unpacked"</strong> button (visible after enabling Developer Mode). In the folder picker, navigate to and select the <strong>extracted extension folder</strong> — the one containing <code>manifest.json</code>.</p>
+            <div class="step-mockup" aria-label="Folder contents showing manifest.json">
+              <div style="font-size:var(--text-xs);color:var(--color-text-muted);margin-bottom:var(--space-2)">📁 enterprise-extension /</div>
+              <div class="mockup-row"><span>📄</span><span>manifest.json</span><span style="margin-left:auto;color:var(--color-accent-green)">✓ required</span></div>
+              <div class="mockup-row"><span>📄</span><span>content.js</span></div>
+              <div class="mockup-row"><span>📄</span><span>background.js</span></div>
+              <div class="mockup-row"><span>📄</span><span>register.html</span></div>
+              <div class="mockup-row"><span>📄</span><span>register.js</span></div>
+              <div class="mockup-row"><span>📄</span><span>calibration.html</span></div>
+              <div class="mockup-row"><span>📄</span><span>calibration.js</span></div>
+            </div>
+            <div class="notice">
+              <span class="notice-icon" aria-hidden="true">✅</span>
+              <span>Once loaded, <strong>Zero Trust — Enterprise Shield</strong> will appear in your extensions list with a shield icon. The extension is now active on all websites.</span>
+            </div>
+          </div>
+        </li>
+
+      </ol>
+    </section>
+
+    <!-- Completion banner -->
+    <section class="install-done" aria-labelledby="done-heading">
+      <span class="done-icon" aria-hidden="true">🛡️</span>
+      <h2 class="gradient-text" id="done-heading">You're Protected</h2>
+      <p>Zero Trust Auth is now silently monitoring behavioral biometrics in the background. No setup required — it starts learning your pattern immediately.</p>
+      <div class="cta-actions">
+        <a href="index.html#docs" class="btn btn-hero-primary"   id="done-api-docs">Connect to the API →</a>
+        <a href="index.html"       class="btn btn-hero-secondary" id="done-home">Back to Home</a>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer" role="contentinfo">
+    <div class="container" style="text-align:center;padding-block:var(--space-10)">
+      <p style="font-size:var(--text-sm);color:var(--color-text-muted)">
+        Zero Trust Auth · ISC License · <a href="index.html">Home</a> · <a href="index.html#docs">API Docs</a>
+      </p>
+    </div>
+  </footer>
+
+  <!-- Download toast notification -->
+  <div id="download-toast" role="status" aria-live="polite" aria-atomic="true">
+    ✅ Download started — check your Downloads folder
+  </div>
+
+  <script type="module" src="js/main.js"></script>
+  <script type="module">
+    import { ThemeManager    } from './js/core/theme.js';
+    import { NavbarController} from './js/components/navbar.js';
+    import { ParticleSystem  } from './js/core/particles.js';
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // Particles
+      const canvas = document.getElementById('particles-canvas');
+      if (canvas) new ParticleSystem(canvas).init();
+
+      // Theme
+      new ThemeManager().init();
+
+      // Navbar
+      new NavbarController().init();
+
+      // Step highlight on scroll
+      const steps = document.querySelectorAll('.install-step');
+      const stepObserver = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+          e.target.classList.toggle('active', e.isIntersecting);
+        });
+      }, { threshold: 0.5 });
+      steps.forEach(s => stepObserver.observe(s));
+
+      // Download toast
+      const downloadBtn = document.getElementById('download-zip-btn');
+      const toast       = document.getElementById('download-toast');
+      downloadBtn?.addEventListener('click', () => {
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 4000);
+        // Auto-scroll to step 1
+        setTimeout(() => {
+          document.getElementById('step-1')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 800);
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,153 @@
+/* ═══════════════════════════════════════════════════════════════
+   DESIGN TOKENS  |  css/base/variables.css
+   Single source of truth for all design values.
+   Dynamic vars (--scroll-ratio, --mouse-x/y, --page-hue, etc.)
+   are updated at runtime by js/core/theme.js.
+   ═══════════════════════════════════════════════════════════════ */
+
+:root {
+  /* ─── COLORS: Background ──────────────────────────────────── */
+  --color-bg-primary:      hsl(220, 65%, 4%);
+  --color-bg-secondary:    hsl(220, 60%, 7%);
+  --color-bg-card:         hsl(220, 55%, 9%);
+  --color-bg-card-hover:   hsl(220, 50%, 13%);
+  --color-bg-glass:        hsla(220, 60%, 12%, 0.55);
+
+  /* ─── COLORS: Brand Accent ────────────────────────────────── */
+  --color-accent-blue:     hsl(var(--page-hue), 100%, 50%);
+  --color-accent-cyan:     hsl(195, 100%, 50%);
+  --color-accent-purple:   hsl(265, 80%, 60%);
+  --color-accent-green:    hsl(155, 100%, 43%);
+  --color-accent-red:      hsl(0, 85%, 60%);
+  --color-accent-orange:   hsl(30, 100%, 55%);
+
+  /* ─── COLORS: Text ────────────────────────────────────────── */
+  --color-text-primary:    hsl(220, 60%, 93%);
+  --color-text-secondary:  hsl(220, 30%, 65%);
+  --color-text-muted:      hsl(220, 20%, 40%);
+
+  /* ─── COLORS: Borders ─────────────────────────────────────── */
+  --color-border:          hsla(210, 80%, 70%, 0.10);
+  --color-border-bright:   hsla(210, 80%, 70%, 0.22);
+  --color-border-accent:   hsla(210, 100%, 60%, 0.38);
+
+  /* ─── COLORS: Glows ───────────────────────────────────────── */
+  --glow-blue:             hsla(var(--page-hue), 100%, 55%, calc(0.30 * var(--glow-intensity)));
+  --glow-cyan:             hsla(195, 100%, 55%, calc(0.20 * var(--glow-intensity)));
+  --glow-purple:           hsla(265, 80%,  60%, calc(0.20 * var(--glow-intensity)));
+
+  /* ─── SPACING SCALE ───────────────────────────────────────── */
+  --space-1:   4px;
+  --space-2:   8px;
+  --space-3:   12px;
+  --space-4:   16px;
+  --space-5:   20px;
+  --space-6:   24px;
+  --space-8:   32px;
+  --space-10:  40px;
+  --space-12:  48px;
+  --space-16:  64px;
+  --space-20:  80px;
+  --space-section: clamp(72px, 9vw, 120px);
+
+  /* ─── BORDER RADIUS ───────────────────────────────────────── */
+  --radius-xs:   5px;
+  --radius-sm:   10px;
+  --radius-md:   16px;
+  --radius-lg:   24px;
+  --radius-full: 9999px;
+
+  /* ─── TYPOGRAPHY ──────────────────────────────────────────── */
+  --font-body:    'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-display: 'Space Grotesk', 'Inter', sans-serif;
+  --font-mono:    'Fira Mono', 'JetBrains Mono', 'Consolas', monospace;
+
+  --text-xs:    0.70rem;
+  --text-sm:    0.80rem;
+  --text-base:  0.90rem;
+  --text-md:    1.00rem;
+  --text-lg:    1.10rem;
+  --text-xl:    1.30rem;
+  --text-2xl:   clamp(1.6rem, 3vw, 2.2rem);
+  --text-3xl:   clamp(2.0rem, 4vw, 3.0rem);
+  --text-hero:  clamp(2.6rem, 6vw, 4.2rem);
+
+  --leading-tight:   1.10;
+  --leading-snug:    1.25;
+  --leading-normal:  1.60;
+  --leading-loose:   1.75;
+
+  --tracking-tight:   -0.04em;
+  --tracking-snug:    -0.02em;
+  --tracking-normal:   0.00em;
+  --tracking-wide:     0.05em;
+  --tracking-wider:    0.08em;
+  --tracking-widest:   0.12em;
+
+  /* ─── TRANSITIONS ─────────────────────────────────────────── */
+  --ease-out:      cubic-bezier(0.00, 0.00, 0.20, 1);
+  --ease-in:       cubic-bezier(0.40, 0.00, 1.00, 1);
+  --ease-inout:    cubic-bezier(0.40, 0.00, 0.20, 1);
+  --ease-spring:   cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  --dur-fast:      150ms;
+  --dur-base:      300ms;
+  --dur-slow:      500ms;
+  --dur-slower:    800ms;
+
+  --transition-fast: var(--dur-fast) var(--ease-inout);
+  --transition-base: var(--dur-base) var(--ease-inout);
+  --transition-slow: var(--dur-slow) var(--ease-inout);
+
+  /* ─── SHADOWS ─────────────────────────────────────────────── */
+  --shadow-sm:      0 2px 12px rgba(0,0,0,0.25);
+  --shadow-md:      0 8px 40px rgba(0,0,0,0.40);
+  --shadow-lg:      0 24px 60px rgba(0,0,0,0.50);
+  --shadow-blue:    0 8px 40px  hsl(var(--page-hue), 100%, 55%, 0.35);
+  --shadow-blue-lg: 0 16px 60px hsl(var(--page-hue), 100%, 55%, 0.50);
+
+  /* ─── Z-INDEX LAYERS ──────────────────────────────────────── */
+  --z-particles: 0;
+  --z-base:      1;
+  --z-content:   2;
+  --z-float:     10;
+  --z-sticky:    50;
+  --z-nav:       100;
+  --z-overlay:   200;
+  --z-modal:     300;
+
+  /* ─── DYNAMIC VARS  (updated by JavaScript at runtime) ────── */
+  --scroll-ratio:    0;      /* 0 → 1 page scroll progress        */
+  --mouse-x:         0.5;    /* 0 → 1 normalized cursor X          */
+  --mouse-y:         0.5;    /* 0 → 1 normalized cursor Y          */
+  --glow-intensity:  1.0;    /* multiplier for glow opacity        */
+  --page-hue:        210;    /* theme hue shifted by theme.js      */
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   THEMES  — toggled via [data-theme] on <html>
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Default: Cyber Dark — no override needed, uses :root values */
+
+[data-theme="space"] {
+  --color-bg-primary:    hsl(255, 50%, 4%);
+  --color-bg-secondary:  hsl(255, 45%, 7%);
+  --color-bg-card:       hsl(255, 40%, 10%);
+  --color-bg-card-hover: hsl(255, 38%, 14%);
+  --color-border:        hsla(265, 60%, 70%, 0.10);
+  --color-border-bright: hsla(265, 60%, 70%, 0.22);
+  --color-accent-cyan:   hsl(280, 80%, 72%);
+  --page-hue: 265;
+}
+
+[data-theme="emerald"] {
+  --color-bg-primary:    hsl(160, 60%, 3%);
+  --color-bg-secondary:  hsl(160, 55%, 6%);
+  --color-bg-card:       hsl(160, 45%, 9%);
+  --color-bg-card-hover: hsl(160, 40%, 13%);
+  --color-border:        hsla(160, 60%, 60%, 0.10);
+  --color-border-bright: hsla(160, 60%, 60%, 0.22);
+  --color-accent-cyan:   hsl(175, 90%, 48%);
+  --page-hue: 160;
+}

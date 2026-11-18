@@ -1,0 +1,139 @@
+/* ═══════════════════════════════════════════════════════════════
+   BUTTONS  |  css/components/buttons.css
+   ═══════════════════════════════════════════════════════════════ */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: 10px 20px;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  text-decoration: none;
+  position: relative;
+  overflow: hidden;
+  transition:
+    transform  var(--transition-fast),
+    box-shadow var(--transition-base),
+    background var(--transition-base);
+  white-space: nowrap;
+}
+
+.btn svg { flex-shrink: 0; }
+
+/* ─── RIPPLE ───────────────────────────────────────────────────── */
+/* Added by JS on click */
+.btn .ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.20);
+  transform: translate(-50%, -50%) scale(0);
+  animation: ripple-expand 0.6s ease-out forwards;
+  pointer-events: none;
+}
+
+@keyframes ripple-expand {
+  to { transform: translate(-50%, -50%) scale(4); opacity: 0; }
+}
+
+/* ─── VARIANTS ─────────────────────────────────────────────────── */
+
+/* Primary — solid blue */
+.btn-primary {
+  background: linear-gradient(
+    135deg,
+    hsl(var(--page-hue), 100%, 50%),
+    hsl(var(--page-hue), 100%, 38%)
+  );
+  color: #fff;
+  box-shadow: var(--shadow-blue);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-blue-lg);
+}
+
+/* Hero Primary — large gradient CTA */
+.btn-hero-primary {
+  background: linear-gradient(
+    135deg,
+    hsl(var(--page-hue), 100%, 50%),
+    var(--color-accent-cyan)
+  );
+  color: #fff;
+  padding: 14px 28px;
+  font-size: var(--text-md);
+  border-radius: var(--radius-md);
+  box-shadow:
+    0 8px 40px hsl(var(--page-hue), 100%, 55%, 0.40),
+    0 0 0 1px rgba(0, 212, 255, 0.18);
+}
+
+.btn-hero-primary:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    0 16px 50px hsl(var(--page-hue), 100%, 55%, 0.55),
+    0 0 0 1px rgba(0, 212, 255, 0.35);
+}
+
+/* Hero Secondary — glass outline */
+.btn-hero-secondary {
+  background: rgba(255,255,255,0.05);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border-bright);
+  padding: 13px 28px;
+  font-size: var(--text-md);
+  border-radius: var(--radius-md);
+  backdrop-filter: blur(10px);
+}
+
+.btn-hero-secondary:hover {
+  transform: translateY(-3px);
+  background: rgba(255,255,255,0.09);
+  border-color: var(--color-accent-cyan);
+  color: var(--color-accent-cyan);
+}
+
+/* Download — full-width primary */
+.btn-download {
+  width: 100%;
+  background: linear-gradient(
+    135deg,
+    hsl(var(--page-hue), 100%, 50%),
+    var(--color-accent-cyan)
+  );
+  color: #fff;
+  padding: 14px;
+  font-size: var(--text-md);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 8px 30px hsl(var(--page-hue), 100%, 55%, 0.30);
+}
+
+.btn-download:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 40px hsl(var(--page-hue), 100%, 55%, 0.50);
+}
+
+/* Download Secondary — full-width ghost */
+.btn-secondary-download {
+  width: 100%;
+  background: rgba(255,255,255,0.04);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border);
+  padding: 13px;
+  font-size: var(--text-base);
+  border-radius: var(--radius-sm);
+}
+
+.btn-secondary-download:hover {
+  background: rgba(255,255,255,0.08);
+  color: var(--color-text-primary);
+  border-color: var(--color-border-bright);
+}

@@ -1,0 +1,29 @@
+/* ═══════════════════════════════════════════════════════════════
+   MAIN CSS ENTRY POINT  |  css/main.css
+   Import order matters: base → components → sections → utils
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Base Layer ────────────────────────────────────────────────── */
+@import url('./base/variables.css');
+@import url('./base/reset.css');
+@import url('./base/typography.css');
+
+/* ── Component Layer ───────────────────────────────────────────── */
+@import url('./components/navbar.css');
+@import url('./components/buttons.css');
+@import url('./components/badges.css');
+@import url('./components/code-block.css');
+
+/* ── Section Layer ─────────────────────────────────────────────── */
+@import url('./sections/hero.css');
+@import url('./sections/social-proof.css');
+@import url('./sections/features.css');
+@import url('./sections/how-it-works.css');
+@import url('./sections/security.css');
+@import url('./sections/download.css');
+@import url('./sections/docs.css');
+@import url('./sections/cta.css');
+
+/* ── Utilities (last — can override) ──────────────────────────── */
+@import url('./utils/animations.css');
+@import url('./utils/responsive.css');

@@ -1,0 +1,155 @@
+/* ═══════════════════════════════════════════════════════════════
+   DOWNLOAD SECTION  |  css/sections/download.css
+   ═══════════════════════════════════════════════════════════════ */
+
+.download-section {
+  position: relative;
+  z-index: var(--z-content);
+  padding-block: var(--space-section);
+  overflow: hidden;
+}
+
+/* Radial glow centered behind the cards */
+.download-glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 800px 400px at 50% 50%,
+    hsl(var(--page-hue), 100%, 55%, 0.10) 0%,
+    transparent 70%);
+  pointer-events: none;
+  opacity: calc(0.6 + var(--glow-intensity) * 0.4);
+  transition: opacity var(--transition-slow);
+}
+
+/* ─── CARDS ROW ────────────────────────────────────────────────── */
+.download-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-6);
+  align-items: start;
+}
+
+/* ─── CARD ─────────────────────────────────────────────────────── */
+.download-card {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-10) var(--space-8);
+  position: relative;
+  transition:
+    border-color var(--transition-base),
+    transform var(--transition-base),
+    box-shadow var(--transition-base);
+
+  /* Scroll-reveal */
+  opacity: 0;
+  transform: translateY(28px);
+}
+
+.download-card.visible { opacity: 1; transform: translateY(0); }
+
+.download-card:hover {
+  border-color: var(--color-border-bright);
+  transform: translateY(-7px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Featured highlight */
+.download-card-featured {
+  border-color: hsl(var(--page-hue), 100%, 55%, 0.30);
+  background: linear-gradient(160deg,
+    var(--color-bg-card),
+    hsl(var(--page-hue), 60%, 12%, 0.40));
+  box-shadow: 0 0 50px hsl(var(--page-hue), 100%, 55%, 0.10);
+}
+
+.download-card-featured:hover {
+  border-color: hsl(var(--page-hue), 100%, 55%, 0.50);
+  box-shadow: 0 0 60px hsl(var(--page-hue), 100%, 55%, 0.20);
+}
+
+/* ─── FEATURED RIBBON ──────────────────────────────────────────── */
+.dc-badge {
+  position: absolute;
+  top: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg,
+    hsl(var(--page-hue), 100%, 50%),
+    var(--color-accent-cyan));
+  color: #fff;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  padding: 4px 16px;
+  border-radius: var(--radius-full);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* ─── ICON ─────────────────────────────────────────────────────── */
+.dc-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px; height: 72px;
+  background: hsl(var(--page-hue), 100%, 55%, 0.07);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  margin: 0 auto var(--space-5);
+  transition: background var(--transition-base), border-color var(--transition-base);
+}
+
+.download-card:hover .dc-icon {
+  background: hsl(var(--page-hue), 100%, 55%, 0.13);
+  border-color: var(--color-border-bright);
+}
+
+/* ─── TYPOGRAPHY ───────────────────────────────────────────────── */
+.download-card h3 {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 700;
+  color: var(--color-text-primary);
+  text-align: center;
+  margin-bottom: var(--space-2);
+}
+
+.dc-version {
+  text-align: center;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: var(--color-accent-cyan);
+  margin-bottom: var(--space-4);
+  letter-spacing: var(--tracking-wide);
+}
+
+.download-card > p {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  text-align: center;
+  line-height: var(--leading-loose);
+  margin-bottom: var(--space-6);
+}
+
+/* ─── FEATURE LIST ─────────────────────────────────────────────── */
+.dc-features {
+  list-style: none;
+  margin-bottom: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.dc-features li {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  padding-inline: var(--space-1);
+}
+
+.dc-compat {
+  text-align: center;
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  margin-top: var(--space-3) !important;
+}

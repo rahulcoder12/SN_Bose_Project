@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="cyber">
+<head>
+  <!-- ─── SEO & META ─────────────────────────────────────────────── -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zero Trust Auth — Behavioral Biometric Security</title>
+  <meta name="description"
+    content="Continuous behavioral biometric authentication engine. Zero Trust Auth monitors keystroke dynamics, mouse patterns, and scroll behavior in real-time using AI — invisibly and persistently." />
+  <meta name="keywords"
+    content="zero trust, biometric authentication, behavioral analytics, AI security, chrome extension, enterprise security" />
+
+  <!-- Open Graph -->
+  <meta property="og:title"       content="Zero Trust Auth — Next-Gen Behavioral Biometric Security" />
+  <meta property="og:description" content="AI-powered continuous authentication that never stops verifying. Install the Chrome extension and protect your enterprise today." />
+  <meta property="og:type"        content="website" />
+  <meta property="og:image"       content="assets/images/og-image.png" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card"        content="summary_large_image" />
+  <meta name="twitter:title"       content="Zero Trust Auth" />
+  <meta name="twitter:description" content="Invisible, continuous AI-powered identity verification." />
+
+  <!-- ─── FONTS ──────────────────────────────────────────────────── -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- ─── STYLES (single import) ────────────────────────────────── -->
+  <link rel="stylesheet" href="css/main.css" />
+</head>
+<body>
+
+  <!-- Scroll progress bar — width driven by --scroll-ratio CSS var -->
+  <div class="scroll-progress" aria-hidden="true"></div>
+
+  <!-- Particle canvas -->
+  <canvas id="particles-canvas" aria-hidden="true"></canvas>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       NAVBAR
+       ═══════════════════════════════════════════════════════════════ -->
+  <nav id="navbar" role="navigation" aria-label="Main navigation">
+    <div class="nav-inner">
+
+      <a href="#hero" class="nav-logo" aria-label="Zero Trust Auth — Home">
+        <div class="logo-shield" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 28 28" fill="none">
+            <path d="M14 2L4 6.5V13.5C4 19.3 8.4 24.7 14 26C19.6 24.7 24 19.3 24 13.5V6.5L14 2Z"
+              fill="url(#shield-fill)" stroke="url(#shield-stroke)" stroke-width="0.5"/>
+            <circle cx="14" cy="14" r="4" fill="none" stroke="#00d4ff" stroke-width="1.5" opacity="0.8"/>
+            <circle cx="14" cy="14" r="2" fill="#00d4ff" opacity="0.9"/>
+            <defs>
+              <linearGradient id="shield-fill" x1="4" y1="2" x2="24" y2="26" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#0066ff" stop-opacity="0.3"/>
+                <stop offset="1" stop-color="#00d4ff" stop-opacity="0.15"/>
+              </linearGradient>
+              <linearGradient id="shield-stroke" x1="4" y1="2" x2="24" y2="26" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#0099ff"/>
+                <stop offset="1" stop-color="#00d4ff"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <span class="logo-text">Zero Trust <span class="logo-accent">Auth</span></span>
+      </a>
+
+      <ul class="nav-links" id="nav-links" role="list">
+        <li><a href="#features"     class="nav-link">Features</a></li>
+        <li><a href="#how-it-works" class="nav-link">How it Works</a></li>
+        <li><a href="#security"     class="nav-link">Security</a></li>
+        <li><a href="#download"     class="nav-link">Download</a></li>
+        <li><a href="#docs"         class="nav-link">API Docs</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <!-- Theme switcher -->
+        <div class="theme-switcher" role="group" aria-label="Choose theme">
+          <button class="theme-btn active" data-theme="cyber"   title="Cyber Dark"  aria-label="Cyber Dark theme">🌑</button>
+          <button class="theme-btn"        data-theme="space"   title="Deep Space"  aria-label="Deep Space theme">🔮</button>
+          <button class="theme-btn"        data-theme="emerald" title="Emerald"     aria-label="Emerald theme">🌿</button>
+        </div>
+
+        <a href="install.html" class="btn btn-primary" id="nav-cta">Install Extension</a>
+
+        <button class="hamburger" id="hamburger"
+          aria-controls="nav-links"
+          aria-expanded="false"
+          aria-label="Toggle navigation menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       HERO
+       ═══════════════════════════════════════════════════════════════ -->
+  <section class="hero" id="hero" aria-labelledby="hero-heading">
+
+    <!-- Parallax glows -->
+    <div class="hero-glow hero-glow-1" aria-hidden="true"></div>
+    <div class="hero-glow hero-glow-2" aria-hidden="true"></div>
+    <div class="hero-glow hero-glow-3" aria-hidden="true"></div>
+
+    <!-- Content column -->
+    <div class="hero-content container">
+      <div class="hero-badge" aria-live="polite">
+        <span class="badge-dot" aria-hidden="true"></span>
+        Enterprise-Grade AI Security
+      </div>
+
+      <h1 class="hero-title" id="hero-heading">
+        Identity That Never<br/>
+        <span class="gradient-text">Stops Verifying</span>
+      </h1>
+
+      <p class="hero-desc">
+        Zero Trust Auth uses behavioral biometrics — keystroke dynamics, mouse patterns, and
+        scroll behavior — powered by an Isolation Forest AI to continuously authenticate users.
+        No friction. No passwords to steal. Just invisible, persistent security.
+      </p>
+
+      <div class="hero-actions">
+        <a href="install.html" class="btn btn-hero-primary" id="hero-cta-primary">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          Install for Chrome — Free
+        </a>
+        <a href="#how-it-works" class="btn btn-hero-secondary" id="hero-cta-secondary">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <circle cx="12" cy="12" r="10"/>
+            <polygon points="10 8 16 12 10 16 10 8"/>
+          </svg>
+          See How It Works
+        </a>
+      </div>
+
+      <div class="hero-stats" role="list" aria-label="Key statistics">
+        <div class="stat-item" role="listitem">
+          <span class="stat-number">99.7%</span>
+          <span class="stat-label">Detection accuracy</span>
+        </div>
+        <div class="stat-divider" aria-hidden="true"></div>
+        <div class="stat-item" role="listitem">
+          <span class="stat-number">&lt;50ms</span>
+          <span class="stat-label">Analysis latency</span>
+        </div>
+        <div class="stat-divider" aria-hidden="true"></div>
+        <div class="stat-item" role="listitem">
+          <span class="stat-number">24h</span>
+          <span class="stat-label">GDPR auto-purge</span>
+        </div>
+        <div class="stat-divider" aria-hidden="true"></div>
+        <div class="stat-item" role="listitem">
+          <span class="stat-number">0</span>
+          <span class="stat-label">User friction</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Visual column -->
+    <div class="hero-visual" aria-hidden="true">
+      <div class="shield-container">
+        <div class="shield-ring shield-ring-outer"></div>
+        <div class="shield-ring shield-ring-mid"></div>
+        <div class="shield-ring shield-ring-inner"></div>
+
+        <div class="shield-core">
+          <svg class="shield-svg" viewBox="0 0 120 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M60 8L8 30V68C8 96 30 120 60 132C90 120 112 96 112 68V30L60 8Z"
+              fill="url(#hero-fill)" stroke="url(#hero-stroke)" stroke-width="2"/>
+            <circle cx="60" cy="70" r="18" fill="none" stroke="#00d4ff" stroke-width="2" opacity="0.5" stroke-dasharray="4 4"/>
+            <circle cx="60" cy="70" r="10" fill="none" stroke="#00aaff" stroke-width="2"/>
+            <circle cx="60" cy="70" r="4" fill="#00d4ff"/>
+            <path d="M42 52 Q60 40 78 52" stroke="#00d4ff" stroke-width="1.5" fill="none" opacity="0.5"/>
+            <path d="M44 88 Q60 100 76 88" stroke="#00d4ff" stroke-width="1.5" fill="none" opacity="0.5"/>
+            <defs>
+              <linearGradient id="hero-fill" x1="8" y1="8" x2="112" y2="132" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#0055ff" stop-opacity="0.25"/>
+                <stop offset="1" stop-color="#00d4ff" stop-opacity="0.10"/>
+              </linearGradient>
+              <linearGradient id="hero-stroke" x1="8" y1="8" x2="112" y2="132" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#4488ff"/>
+                <stop offset="1" stop-color="#00d4ff"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+
+        <!-- Floating metric badges -->
+        <div class="float-badge float-badge-1">
+          <span class="fb-icon">⌨️</span>
+          <div class="fb-content">
+            <div class="fb-label">Keystroke</div>
+            <div class="fb-value">Verified ✓</div>
+          </div>
+        </div>
+
+        <div class="float-badge float-badge-2">
+          <span class="fb-icon">🖱️</span>
+          <div class="fb-content">
+            <div class="fb-label">Mouse Pattern</div>
+            <div class="fb-value">98.2% match</div>
+          </div>
+        </div>
+
+        <div class="float-badge float-badge-3">
+          <span class="fb-icon">🤖</span>
+          <div class="fb-content">
+            <div class="fb-label">AI Confidence</div>
+            <div class="fb-value">
+              <span class="progress-bar-wrap">
+                <span class="progress-bar" style="width:94%"></span>
+                94%
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       SOCIAL PROOF
+       ═══════════════════════════════════════════════════════════════ -->
+  <section class="social-proof" aria-label="Trusted by">
+    <div class="container">
+      <p class="sp-label">Trusted by security-first teams</p>
+      <ul class="sp-logos" role="list" aria-label="Client logos">
+        <li class="sp-logo">Enterprise Corp</li>
+        <li class="sp-logo">SecureBank AG</li>
+        <li class="sp-logo">HealthShield</li>
+        <li class="sp-logo">GovTech Labs</li>
+        <li class="sp-logo">FinTrust Inc</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       FEATURES
+       ═══════════════════════════════════════════════════════════════ -->
+  <section class="features" id="features" aria-labelledby="features-heading">
+    <div class="container">
+      <header class="section-header">
+        <div class="section-badge">Core Features</div>
+        <h2 class="section-title" id="features-heading">
+          Authentication That Thinks<br/>Like a Security Expert
+        </h2>
+        <p class="section-subtitle">
+          Every interaction is silently analysed by an Isolation Forest AI model
+          trained on your unique behavioural fingerprint.
+        </p>
+      </header>
+
+      <div class="features-grid">
+
+        <article class="feature-card feature-card-large">
+          <div class="fc-glow" aria-hidden="true"></div>
+          <div class="fc-icon" aria-hidden="true">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
+              <circle cx="12" cy="9" r="2.5"/>
+            </svg>
+          </div>
+          <h3>Behavioral Fingerprinting</h3>
+          <p>Continuously captures keystroke timing, inter-key intervals, mouse velocity, acceleration curves, and scroll rhythms to build an invisible biometric profile unique to each user.</p>
+          <div class="fc-graphic" aria-hidden="true">
+            <div class="wave-bar" style="--h:60%;--d:0s"></div>
+            <div class="wave-bar" style="--h:80%;--d:0.1s"></div>
+            <div class="wave-bar" style="--h:45%;--d:0.2s"></div>
+            <div class="wave-bar" style="--h:90%;--d:0.3s"></div>
+            <div class="wave-bar" style="--h:55%;--d:0.4s"></div>
+            <div class="wave-bar" style="--h:75%;--d:0.5s"></div>
+            <div class="wave-bar" style="--h:40%;--d:0.6s"></div>
+            <div class="wave-bar" style="--h:85%;--d:0.7s"></div>
+          </div>
+        </article>
+
+        <article class="feature-card">
+          <div class="fc-glow" aria-hidden="true"></div>
+          <div class="fc-icon" aria-hidden="true">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M12 6v6l4 2"/>
+            </svg>
+          </div>
+          <h3>Real-Time AI Analysis</h3>
+          <p>Isolation Forest model processes telemetry in under 50 ms and flags anomalies instantly. Alerts your SOC team via webhook the moment a threat is detected.</p>
+        </article>
+
+        <article class="feature-card">
+          <div class="fc-glow" aria-hidden="true"></div>
+          <div class="fc-icon" aria-hidden="true">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+          </div>
+          <h3>Zero-Knowledge Auth</h3>
+          <p>Raw biometric data never leaves the session scope. Only statistical vectors are transmitted, keeping all PII fully protected at the client layer.</p>
+        </article>
+
+        <article class="feature-card">
+          <div class="fc-glow" aria-hidden="true"></div>
+          <div class="fc-icon" aria-hidden="true">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+            </svg>
+          </div>
+          <h3>Live Session Dashboard</h3>
+          <p>Admin console shows all active sessions, identity confidence scores, anomaly flags, and behaviour drift — a live SIEM feed for every user on your platform.</p>
+        </article>
+
+        <article class="feature-card">
+          <div class="fc-glow" aria-hidden="true"></div>
+          <div class="fc-icon" aria-hidden="true">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+          </div>
+          <h3>GDPR Compliant</h3>
+          <p>Automatic 24-hour biometric data eviction, parameterised SQL queries, and full audit logging ensure compliance with GDPR, SOC 2, and ISO 27001.</p>
+        </article>
+
+        <article class="feature-card">
+          <div class="fc-glow" aria-hidden="true"></div>
+          <div class="fc-icon" aria-hidden="true">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <circle cx="12" cy="8" r="6"/>
+              <path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/>
+            </svg>
+          </div>
+          <h3>Enterprise REST API</h3>
+          <p>Full REST API with JWT + API-key auth, rate limiting, and WebSocket support. Integrate biometric trust scores directly into your existing auth stack via the client SDK.</p>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       HOW IT WORKS
+       ═══════════════════════════════════════════════════════════════ -->
+  <section class="how-it-works" id="how-it-works" aria-labelledby="hiw-heading">
+    <div class="container">
+      <header class="section-header">
+        <div class="section-badge">The Process</div>
+        <h2 class="section-title" id="hiw-heading">
+          From Install to<br/>Invisible Protection
+        </h2>
+        <p class="section-subtitle">
+          Four steps and you're protected. The extension handles everything
+          transparently in the background.
+        </p>
+      </header>
+
+      <ol class="steps-timeline" aria-label="Setup steps">
+
+        <li class="step" data-step="01">
+          <div class="step-icon" aria-hidden="true">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+          </div>
+          <div class="step-content">
+            <h3>Install &amp; Register</h3>
+            <p>Add the Chrome extension in one click. Create an account and baseline training begins automatically.</p>
+          </div>
+        </li>
+
+        <div class="step-connector" aria-hidden="true"></div>
+
+        <li class="step" data-step="02">
+          <div class="step-icon" aria-hidden="true">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+          </div>
+          <div class="step-content">
+            <h3>Calibration Phase</h3>
+            <p>Browse naturally for a few minutes. The AI observes your typing cadence, mouse signature, and scroll rhythm.</p>
+          </div>
+        </li>
+
+        <div class="step-connector" aria-hidden="true"></div>
+
+        <li class="step" data-step="03">
+          <div class="step-icon" aria-hidden="true">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              <path d="M9 12l2 2 4-4"/>
+            </svg>
+          </div>
+          <div class="step-content">
+            <h3>Continuous Verification</h3>
+            <p>Every 5 seconds, the AI re-verifies your identity silently. No popups, no re-logins.</p>
+          </div>
+        </li>
+
+        <div class="step-connector" aria-hidden="true"></div>
+
+        <li class="step" data-step="04">
+          <div class="step-icon" aria-hidden="true">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M18 8h1a4 4 0 0 1 0 8h-1"/>
+              <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/>
+              <line x1="6" y1="1" x2="6" y2="4"/>
+              <line x1="10" y1="1" x2="10" y2="4"/>
+              <line x1="14" y1="1" x2="14" y2="4"/>
+            </svg>
+          </div>
+          <div class="step-content">
+            <h3>SOC Alerting</h3>
+            <p>Anomalies trigger real-time webhook alerts to your SOC. Review live sessions and suspend threats instantly.</p>
+          </div>
+        </li>
+
+      </ol>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       SECURITY ARCHITECTURE
+       ═══════════════════════════════════════════════════════════════ -->
+  <section class="security-section" id="security" aria-labelledby="security-heading">
+    <div class="container security-inner">
+
+      <div class="security-content">
+        <div class="section-badge">Security Architecture</div>
+        <h2 class="section-title" id="security-heading">
+          Built with<br/>Defence-in-Depth
+        </h2>
+        <p class="section-subtitle">
+          Every layer is hardened. From bcrypt password hashing to parameterised SQL
+          queries, Zero Trust Auth is engineered by security engineers, for security engineers.
+        </p>
+
+        <ul class="security-list" aria-label="Security features">
+          <li class="sec-item"><div class="sec-check" aria-hidden="true">✓</div><div><strong>bcrypt (12 rounds)</strong> — Maximum-cost password hashing</div></li>
+          <li class="sec-item"><div class="sec-check" aria-hidden="true">✓</div><div><strong>JWT Auth</strong> — 30-min access tokens + 7-day refresh rotation</div></li>
+          <li class="sec-item"><div class="sec-check" aria-hidden="true">✓</div><div><strong>Rate Limiting</strong> — 5/min login, 3/min register, 20/min telemetry</div></li>
+          <li class="sec-item"><div class="sec-check" aria-hidden="true">✓</div><div><strong>Security Headers</strong> — HSTS, X-Content-Type-Options, X-Frame-Options</div></li>
+          <li class="sec-item"><div class="sec-check" aria-hidden="true">✓</div><div><strong>Parameterised SQL</strong> — Zero SQL injection surface, always parameterised</div></li>
+          <li class="sec-item"><div class="sec-check" aria-hidden="true">✓</div><div><strong>Audit Logging</strong> — Rotating file handler with full request audit trail</div></li>
+        </ul>
+
+          <a href="install.html" class="btn btn-primary" id="security-cta">Get Protected Now</a>
+      </div>
+
+      <div class="security-visual" aria-hidden="true">
+
+        <!-- Card 1: AI Engine -->
+        <div class="security-card">
+          <div class="sc-header">
+            <div class="sc-dot sc-dot-green"></div>
+            <span>AI Anomaly Engine</span>
+          </div>
+          <div class="sc-body">
+            <div class="sc-metric">
+              <span>Isolation Forest</span>
+              <span class="badge-active">ACTIVE</span>
+            </div>
+            <div class="sc-metric">
+              <span>Current User Score</span>
+              <span class="sc-score">97.4%</span>
+            </div>
+            <div class="sc-metric">
+              <span>Anomalies (24h)</span>
+              <span class="sc-value">0</span>
+            </div>
+          </div>
+          <div class="sc-pulse-bar"><div class="sc-pulse-fill"></div></div>
+        </div>
+
+        <!-- Card 2: Live Sessions -->
+        <div class="security-card">
+          <div class="sc-header">
+            <div class="sc-dot sc-dot-blue"></div>
+            <span>Live Sessions</span>
+          </div>
+          <ul class="session-list">
+            <li class="session-item">
+              <div class="session-avatar">JD</div>
+              <div class="session-info">
+                <div class="session-name">John Doe</div>
+                <div class="session-time">Active 4m ago</div>
+              </div>
+              <div class="session-status verified" aria-label="Verified">✓</div>
+            </li>
+            <li class="session-item">
+              <div class="session-avatar">SA</div>
+              <div class="session-info">
+                <div class="session-name">Sarah A.</div>
+                <div class="session-time">Active now</div>
+              </div>
+              <div class="session-status verified" aria-label="Verified">✓</div>
+            </li>
+            <li class="session-item">
+              <div class="session-avatar" style="background:linear-gradient(135deg,#ff4444,#ff8800)">??</div>
+              <div class="session-info">
+                <div class="session-name">Unknown</div>
+                <div class="session-time">Alert sent</div>
+              </div>
+              <div class="session-status flagged" aria-label="Flagged anomaly">⚠</div>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Card 3: Behavior Metrics -->
+        <div class="security-card">
+          <div class="sc-header">
+            <div class="sc-dot sc-dot-purple"></div>
+            <span>Behavior Metrics</span>
+          </div>
+          <div class="metric-bars">
+            <div class="metric-bar-item">
+              <span>Keystroke WPM</span>
+              <div class="mbar"><div class="mbar-fill" style="width:72%"></div></div>
+              <span class="mval">72</span>
+            </div>
+            <div class="metric-bar-item">
+              <span>Mouse Speed</span>
+              <div class="mbar"><div class="mbar-fill" style="width:58%"></div></div>
+              <span class="mval">Norm.</span>
+            </div>
+            <div class="metric-bar-item">
+              <span>Scroll Rate</span>
+              <div class="mbar"><div class="mbar-fill" style="width:85%"></div></div>
+              <span class="mval">High</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       DOWNLOAD
+       ═══════════════════════════════════════════════════════════════ -->
+  <section class="download-section" id="download" aria-labelledby="download-heading">
+    <div class="download-glow" aria-hidden="true"></div>
+    <div class="container">
+      <header class="section-header">
+        <div class="section-badge">Get Started</div>
+        <h2 class="section-title" id="download-heading">Install Zero Trust Auth</h2>
+        <p class="section-subtitle">
+          Available as a Chrome Extension and enterprise API.
+          Start protecting your users in minutes.
+        </p>
+      </header>
+
+      <div class="download-cards">
+
+        <!-- Chrome Extension -->
+        <article class="download-card download-card-featured">
+          <div class="dc-badge">Most Popular</div>
+          <div class="dc-icon" aria-hidden="true">
+            <svg width="44" height="44" viewBox="0 0 48 48" fill="none">
+              <circle cx="24" cy="24" r="10" fill="#1A73E8"/>
+              <path d="M24 14h16.8A20 20 0 1 0 24 44V38a14 14 0 1 1 0-28z" fill="#4285F4"/>
+              <path d="M14.8 29L7.2 16A20 20 0 0 0 24 44v-6a14 14 0 0 1-9.2-9z" fill="#34A853"/>
+              <path d="M40.8 14H24v6h16.8A20 20 0 0 0 7.2 16l6.4 4A14 14 0 0 1 40.8 14z" fill="#FBBC05"/>
+              <circle cx="24" cy="24" r="7" fill="white"/>
+              <circle cx="24" cy="24" r="5" fill="#1A73E8"/>
+            </svg>
+          </div>
+          <h3>Chrome Extension</h3>
+          <p class="dc-version">Version 1.0.0 — Manifest V3</p>
+          <p>Install directly from the Chrome Web Store. Works on all Chromium-based browsers including Edge, Brave, and Arc.</p>
+          <ul class="dc-features">
+            <li>✓ One-click installation</li>
+            <li>✓ Automatic updates</li>
+            <li>✓ Works on all websites</li>
+            <li>✓ Secure background monitoring</li>
+          </ul>
+          <a href="install.html"
+            class="btn btn-download" id="download-chrome">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            Add to Chrome — Free
+          </a>
+          <p class="dc-compat">Also works on Edge, Brave &amp; Arc</p>
+        </article>
+
+        <!-- Developer Install -->
+        <article class="download-card">
+          <div class="dc-icon" aria-hidden="true">
+            <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <polyline points="16 18 22 12 16 6"/>
+              <polyline points="8 6 2 12 8 18"/>
+            </svg>
+          </div>
+          <h3>Developer Install</h3>
+          <p class="dc-version">Manual — Load Unpacked</p>
+          <p>Clone the repository and load the extension in Chrome Developer Mode for local development and customisation.</p>
+          <div class="code-block">
+            <div class="code-header">
+              <span>Terminal</span>
+              <button class="copy-btn" data-code="git clone https://github.com/rahulcoder12/SN_Bose_Project
+cd SN_Bose_Project/enterprise-extension">Copy</button>
+            </div>
+            <pre><code>git clone https://github.com/rahulcoder12/SN_Bose_Project
+cd SN_Bose_Project/enterprise-extension</code></pre>
+          </div>
+          <a href="https://github.com/rahulcoder12/SN_Bose_Project" target="_blank" rel="noopener noreferrer"
+            class="btn btn-secondary-download" id="download-github">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+            </svg>
+            View on GitHub
+          </a>
+        </article>
+
+        <!-- Enterprise API -->
+        <article class="download-card">
+          <div class="dc-icon" aria-hidden="true">
+            <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <rect x="2" y="3" width="20" height="14" rx="2"/>
+              <path d="M8 21h8"/>
+              <path d="M12 17v4"/>
+            </svg>
+          </div>
+          <h3>Enterprise API</h3>
+          <p class="dc-version">Self-hosted — Docker</p>
+          <p>Deploy the full backend stack with Docker Compose. Includes FastAPI, PostgreSQL, and the AI inference engine.</p>
+          <div class="code-block">
+            <div class="code-header">
+              <span>Terminal</span>
+              <button class="copy-btn" data-code="docker-compose up --build">Copy</button>
+            </div>
+            <pre><code>docker-compose up --build</code></pre>
+          </div>
+          <ul class="dc-features">
+            <li>✓ Full API access</li>
+            <li>✓ Admin dashboard</li>
+            <li>✓ SOC webhook integration</li>
+            <li>✓ Client SDK included</li>
+          </ul>
+          <a href="#docs" class="btn btn-secondary-download" id="download-enterprise">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+            </svg>
+            Read the Docs
+          </a>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       API DOCS
+       ═══════════════════════════════════════════════════════════════ -->
+  <section class="docs-section" id="docs" aria-labelledby="docs-heading">
+    <div class="container">
+      <header class="section-header">
+        <div class="section-badge">API Reference</div>
+        <h2 class="section-title" id="docs-heading">Integrate in Minutes</h2>
+        <p class="section-subtitle">
+          Clean REST API with comprehensive documentation.
+          From zero to protected in under 10 minutes.
+        </p>
+      </header>
+
+      <div class="docs-grid" role="tablist" aria-label="API documentation tabs">
+
+        <nav class="docs-nav">
+          <button class="docs-tab" role="tab" data-panel="auth"   aria-controls="panel-auth"   aria-selected="true"  tabindex="0">Authentication</button>
+          <button class="docs-tab" role="tab" data-panel="ingest" aria-controls="panel-ingest" aria-selected="false" tabindex="-1">Telemetry Ingest</button>
+          <button class="docs-tab" role="tab" data-panel="admin"  aria-controls="panel-admin"  aria-selected="false" tabindex="-1">Admin Sessions</button>
+        </nav>
+
+        <!-- Auth panel -->
+        <div class="docs-panel" id="panel-auth" role="tabpanel" aria-labelledby="tab-auth">
+          <div class="endpoint-group">
+            <div class="endpoint"><span class="method post">POST</span><span class="path">/api/v1/auth/register</span><span class="auth-tag">Public</span></div>
+            <div class="endpoint"><span class="method post">POST</span><span class="path">/api/v1/auth/login</span><span class="auth-tag">Public</span></div>
+            <div class="endpoint"><span class="method post">POST</span><span class="path">/api/v1/auth/refresh</span><span class="auth-tag">Public</span></div>
+            <div class="endpoint"><span class="method get">GET</span><span class="path">/api/v1/auth/me</span><span class="auth-tag jwt">JWT</span></div>
+          </div>
+          <div class="code-block">
+            <div class="code-header">
+              <span>Example — Login</span>
+              <button class="copy-btn" data-code='curl -X POST https://your-api/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '"'"'{"email":"user@co.com","password":"secret"}'"'"''>Copy</button>
+            </div>
+            <pre><code>curl -X POST https://your-api/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"user@co.com","password":"secret"}'
+
+# Response
+{
+  "access_token":  "eyJ...",
+  "refresh_token": "eyJ...",
+  "token_type":    "bearer"
+}</code></pre>
+          </div>
+        </div>
+
+        <!-- Ingest panel -->
+        <div class="docs-panel" id="panel-ingest" role="tabpanel" aria-labelledby="tab-ingest" hidden>
+          <div class="endpoint-group">
+            <div class="endpoint"><span class="method post">POST</span><span class="path">/api/v1/ingest</span><span class="auth-tag apikey">API Key</span></div>
+            <div class="endpoint"><span class="method post">POST</span><span class="path">/api/v1/calibrate/complete</span><span class="auth-tag apikey">API Key</span></div>
+          </div>
+          <div class="code-block">
+            <div class="code-header">
+              <span>Example — Submit Telemetry</span>
+              <button class="copy-btn" data-code='curl -X POST https://your-api/api/v1/ingest \
+  -H "X-API-Key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '"'"'{"user_id":"u_123","keystroke_data":[...],"mouse_data":[...]}'"'"''>Copy</button>
+            </div>
+            <pre><code>curl -X POST https://your-api/api/v1/ingest \
+  -H "X-API-Key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"user_id":"u_123","keystroke_data":[...],"mouse_data":[...]}'
+
+# Response
+{
+  "anomaly_score": 0.032,
+  "is_anomaly":    false,
+  "confidence":    0.974
+}</code></pre>
+          </div>
+        </div>
+
+        <!-- Admin panel -->
+        <div class="docs-panel" id="panel-admin" role="tabpanel" aria-labelledby="tab-admin" hidden>
+          <div class="endpoint-group">
+            <div class="endpoint"><span class="method get">GET</span><span class="path">/api/v1/admin/sessions</span><span class="auth-tag jwt">JWT</span></div>
+            <div class="endpoint"><span class="method get">GET</span><span class="path">/health</span><span class="auth-tag">Public</span></div>
+          </div>
+          <div class="code-block">
+            <div class="code-header">
+              <span>Example — Live Sessions</span>
+              <button class="copy-btn" data-code='curl https://your-api/api/v1/admin/sessions \
+  -H "Authorization: Bearer YOUR_JWT"'>Copy</button>
+            </div>
+            <pre><code>curl https://your-api/api/v1/admin/sessions \
+  -H "Authorization: Bearer YOUR_JWT"
+
+# Response
+{
+  "active_sessions": 14,
+  "flagged": 1,
+  "sessions": [
+    { "user": "john@co.com",  "score": 0.97, "flagged": false },
+    { "user": "unknown@ip",   "score": 0.21, "flagged": true  }
+  ]
+}</code></pre>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       FINAL CTA
+       ═══════════════════════════════════════════════════════════════ -->
+  <section class="final-cta" aria-labelledby="cta-heading">
+    <div class="cta-glow" aria-hidden="true"></div>
+    <div class="container">
+      <h2 id="cta-heading">
+        Your Users Deserve<br/>
+        <span class="gradient-text">Invisible Protection</span>
+      </h2>
+      <p>Zero passwords to phish. Zero re-authentication friction. Zero trust in everyone — by design.</p>
+      <div class="cta-actions">
+        <a href="install.html" class="btn btn-hero-primary"   id="final-cta-primary">Install for Chrome — Free</a>
+        <a href="#docs"     class="btn btn-hero-secondary" id="final-cta-secondary">Read the API Docs</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       FOOTER
+       ═══════════════════════════════════════════════════════════════ -->
+  <footer class="footer" role="contentinfo">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <a href="#hero" class="nav-logo" aria-label="Zero Trust Auth">
+          <div class="logo-shield" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 28 28" fill="none">
+              <path d="M14 2L4 6.5V13.5C4 19.3 8.4 24.7 14 26C19.6 24.7 24 19.3 24 13.5V6.5L14 2Z"
+                fill="url(#f-fill)" stroke="url(#f-stroke)" stroke-width="0.5"/>
+              <circle cx="14" cy="14" r="4" fill="none" stroke="#00d4ff" stroke-width="1.5" opacity="0.8"/>
+              <circle cx="14" cy="14" r="2" fill="#00d4ff" opacity="0.9"/>
+              <defs>
+                <linearGradient id="f-fill"   x1="4" y1="2" x2="24" y2="26" gradientUnits="userSpaceOnUse"><stop stop-color="#0066ff" stop-opacity="0.3"/><stop offset="1" stop-color="#00d4ff" stop-opacity="0.15"/></linearGradient>
+                <linearGradient id="f-stroke" x1="4" y1="2" x2="24" y2="26" gradientUnits="userSpaceOnUse"><stop stop-color="#0099ff"/><stop offset="1" stop-color="#00d4ff"/></linearGradient>
+              </defs>
+            </svg>
+          </div>
+          <span class="logo-text" style="font-size:0.95rem">Zero Trust <span class="logo-accent">Auth</span></span>
+        </a>
+        <p>Continuous behavioral biometric authentication. No friction, no compromise.</p>
+        <p class="footer-copy">© 2026 Zero Trust Auth. ISC License.</p>
+      </div>
+
+      <nav class="footer-links" aria-label="Footer navigation">
+        <div class="footer-col">
+          <h4>Product</h4>
+          <a href="#features">Features</a>
+          <a href="#how-it-works">How it Works</a>
+          <a href="#security">Security</a>
+          <a href="#download">Download</a>
+        </div>
+        <div class="footer-col">
+          <h4>Developers</h4>
+          <a href="#docs">API Reference</a>
+          <a href="https://github.com/rahulcoder12/SN_Bose_Project" target="_blank" rel="noopener">GitHub</a>
+          <a href="#download">Client SDK</a>
+          <a href="#download">Docker Setup</a>
+        </div>
+        <div class="footer-col">
+          <h4>Compliance</h4>
+          <a href="#">GDPR Policy</a>
+          <a href="#">Privacy Notice</a>
+          <a href="#">SOC 2 Info</a>
+          <a href="#">Terms of Use</a>
+        </div>
+      </nav>
+    </div>
+  </footer>
+
+  <!-- ─── SCRIPTS (ES modules, deferred by default) ─────────────── -->
+  <script type="module" src="js/main.js"></script>
+
+</body>
+</html>
